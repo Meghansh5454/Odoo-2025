@@ -302,6 +302,18 @@ const cardStyle = {
     transition: 'transform 0.3s ease-in-out',
 };
 
+const horizontalCardStyle = {
+    backgroundColor: '#FFFFFF',
+    borderRadius: '0.75rem',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    overflow: 'hidden',
+    cursor: 'pointer',
+    transition: 'transform 0.3s ease-in-out',
+    minWidth: '280px',
+    maxWidth: '320px',
+    flexShrink: 0,
+};
+
 const cardImageStyle = {
     width: '100%',
     height: '12rem', // h-48
@@ -508,6 +520,35 @@ const dashboardGridStyle = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
     gap: '1.5rem',
+};
+
+const horizontalGridStyle = {
+    display: 'flex',
+    flexWrap: 'nowrap',
+    gap: '1.5rem',
+    overflowX: 'auto',
+    padding: '0.5rem 0',
+    scrollbarWidth: 'thin',
+    scrollbarColor: '#CBD5E0 #F7FAFC',
+};
+
+// Custom scrollbar styles for webkit browsers
+const horizontalGridStyleWithScrollbar = {
+    ...horizontalGridStyle,
+    '&::-webkit-scrollbar': {
+        height: '8px',
+    },
+    '&::-webkit-scrollbar-track': {
+        background: '#F7FAFC',
+        borderRadius: '4px',
+    },
+    '&::-webkit-scrollbar-thumb': {
+        background: '#CBD5E0',
+        borderRadius: '4px',
+    },
+    '&::-webkit-scrollbar-thumb:hover': {
+        background: '#A0AEC0',
+    },
 };
 
 const dashboardItemCardStyle = {
@@ -2010,9 +2051,9 @@ const BrowseItemsPage = ({ onNavigate }) => {
                 </div>
 
                 {/* Items Grid */}
-                <div style={dashboardGridStyle}>
+                <div style={horizontalGridStyle} className="horizontal-scroll">
                     {filteredItems.map((item) => (
-                        <div key={item._id} style={cardStyle}>
+                        <div key={item._id} style={horizontalCardStyle}>
                             <div style={{ position: 'relative', overflow: 'hidden' }}>
                                 <img
                                     src={item.imageUrl || `https://placehold.co/400x300/E0E7FF/3B82F6?text=${item.title}`}
@@ -3761,8 +3802,13 @@ const AdminPanel = ({ onNavigate }) => {
     };
 
     return (
-        <div style={pageContainerStyle}>
-            <div style={formCardStyle}>
+        <div style={{ ...pageContainerStyle, padding: '1rem' }}>
+            <div style={{ 
+                ...formCardStyle, 
+                maxWidth: '95vw', 
+                width: '100%',
+                minWidth: '800px'
+            }}>
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                     <div>
@@ -3825,7 +3871,7 @@ const AdminPanel = ({ onNavigate }) => {
 
                 {/* Controls */}
                 <div style={adminPanelFilterStyle}>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                         <button
                             style={{ 
                                 ...primaryButtonStyle, 
@@ -3853,12 +3899,12 @@ const AdminPanel = ({ onNavigate }) => {
                     </div>
                     
                     {/* Filters */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', flex: '1' }}>
                             <select
                                 value={selectedCategory}
                                 onChange={(e) => setSelectedCategory(e.target.value)}
-                                style={{ ...inputStyle, width: '150px' }}
+                                style={{ ...inputStyle, width: '180px' }}
                             >
                                 {categories.map(cat => (
                                     <option key={cat} value={cat}>
@@ -3870,7 +3916,7 @@ const AdminPanel = ({ onNavigate }) => {
                             <select
                                 value={selectedStatus}
                                 onChange={(e) => setSelectedStatus(e.target.value)}
-                                style={{ ...inputStyle, width: '150px' }}
+                                style={{ ...inputStyle, width: '180px' }}
                             >
                                 {statuses.map(status => (
                                     <option key={status} value={status}>
@@ -3886,7 +3932,7 @@ const AdminPanel = ({ onNavigate }) => {
                                     setSortBy(field);
                                     setSortOrder(order);
                                 }}
-                                style={{ ...inputStyle, width: '150px' }}
+                                style={{ ...inputStyle, width: '180px' }}
                             >
                                 <option value="createdAt-desc">Newest First</option>
                                 <option value="createdAt-asc">Oldest First</option>
@@ -3901,7 +3947,7 @@ const AdminPanel = ({ onNavigate }) => {
                                 placeholder="Search by title or uploader..."
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
-                                style={{ ...inputStyle, width: '200px' }}
+                                style={{ ...inputStyle, width: '250px' }}
                             />
                         </div>
                     </div>
@@ -4006,10 +4052,10 @@ const AdminPanel = ({ onNavigate }) => {
                 {/* Items Table */}
                 {!loading && filteredItems.length > 0 && (
                     <div style={{ overflow: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem', tableLayout: 'fixed' }}>
                             <thead>
                                 <tr style={{ borderBottom: '2px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>
-                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600', width: '40px' }}>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600', width: '50px' }}>
                                         <input
                                             type="checkbox"
                                             checked={selectedItems.length === filteredItems.length && filteredItems.length > 0}
@@ -4017,13 +4063,13 @@ const AdminPanel = ({ onNavigate }) => {
                                             style={{ width: '16px', height: '16px' }}
                                         />
                                     </th>
-                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Item</th>
-                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Uploader</th>
-                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Category</th>
-                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Points</th>
-                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Status</th>
-                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Date</th>
-                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Actions</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600', width: '25%' }}>Item</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600', width: '20%' }}>Uploader</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600', width: '12%' }}>Category</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600', width: '8%' }}>Points</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600', width: '10%' }}>Status</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600', width: '12%' }}>Date</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600', width: '13%' }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -4199,6 +4245,29 @@ const AppContent = () => {
 
 // Main App Component
 const App = () => {
+    // Add custom scrollbar styles
+    React.useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = `
+            .horizontal-scroll::-webkit-scrollbar {
+                height: 8px;
+            }
+            .horizontal-scroll::-webkit-scrollbar-track {
+                background: #F7FAFC;
+                border-radius: 4px;
+            }
+            .horizontal-scroll::-webkit-scrollbar-thumb {
+                background: #CBD5E0;
+                border-radius: 4px;
+            }
+            .horizontal-scroll::-webkit-scrollbar-thumb:hover {
+                background: #A0AEC0;
+            }
+        `;
+        document.head.appendChild(style);
+        return () => document.head.removeChild(style);
+    }, []);
+
     return (
         <div style={rootContainerStyle}>
             <AuthProvider>
