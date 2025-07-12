@@ -1,5 +1,949 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { User, Star, Package, RefreshCw, TrendingUp, Plus, Edit, Heart, Search, Filter, ArrowLeft, MessageCircle, Shield, Truck, Camera, Save, MapPin, Calendar, Mail, Phone } from 'lucide-react'; // Lucide icons
+import { User, Star, Package, RefreshCw, TrendingUp, Plus, Edit, Heart, Search, Filter, ArrowLeft, MessageCircle, Shield, Truck, Camera, Save, MapPin, Calendar, Mail, Phone, Coins, TrendingDown, Gift, ShoppingBag, Award, Clock, CheckCircle, UserCheck, Send, Download, Minus } from 'lucide-react'; // Lucide icons
+
+// --- Inline Styles (replacing Tailwind CSS) ---
+// These styles are basic and can be expanded upon with proper CSS files or a different styling solution.
+
+const rootContainerStyle = {
+    fontFamily: 'sans-serif', // Fallback font
+    WebkitFontSmoothing: 'antialiased',
+    MozOsxFontSmoothing: 'grayscale',
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: '#F7FAFC', // Light gray background
+};
+
+const appContainerStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100vh',
+    backgroundColor: '#F7FAFC',
+};
+
+const pageContainerStyle = {
+    minHeight: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F7FAFC',
+    padding: '1rem',
+};
+
+const formCardStyle = {
+    backgroundColor: '#FFFFFF',
+    padding: '2rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    width: '100%',
+    maxWidth: '28rem',
+};
+
+const formTitleStyle = {
+    fontSize: '1.875rem',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#2D3748',
+    marginBottom: '2rem',
+};
+
+const formStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.5rem',
+};
+
+const labelStyle = {
+    display: 'block',
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    color: '#4A5568',
+    marginBottom: '0.25rem',
+};
+
+const inputStyle = {
+    width: '100%',
+    padding: '0.5rem 1rem',
+    border: '1px solid #CBD5E0',
+    borderRadius: '0.375rem',
+    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+    outline: 'none',
+    transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
+    boxSizing: 'border-box', // Ensure no overflow
+};
+
+const primaryButtonStyle = {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '0.75rem 1rem',
+    border: '1px solid transparent',
+    borderRadius: '0.375rem',
+    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+    fontSize: '1.125rem',
+    fontWeight: '500',
+    color: '#FFFFFF',
+    backgroundColor: '#3182CE', // Blue-600
+    cursor: 'pointer',
+    transition: 'background-color 0.15s ease-in-out',
+};
+
+const secondaryButtonStyle = {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '0.75rem 1rem',
+    border: '1px solid transparent',
+    borderRadius: '0.375rem',
+    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+    fontSize: '1.125rem',
+    fontWeight: '500',
+    color: '#FFFFFF',
+    backgroundColor: '#48BB78', // Green-600
+    cursor: 'pointer',
+    transition: 'background-color 0.15s ease-in-out',
+};
+
+const linkButtonStyle = {
+    fontWeight: '500',
+    color: '#3182CE',
+    background: 'none',
+    border: 'none',
+    padding: '0',
+    cursor: 'pointer',
+    textDecoration: 'underline',
+};
+
+const formTextStyle = {
+    marginTop: '1.5rem',
+    textAlign: 'center',
+    color: '#4A5568',
+};
+
+const messageBoxOverlayStyle = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '1rem',
+    zIndex: 50,
+};
+
+const messageBoxContentStyle = {
+    backgroundColor: '#FFFFFF',
+    borderRadius: '0.5rem',
+    padding: '1.5rem',
+    boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)',
+    maxWidth: '24rem',
+    width: '100%',
+    textAlign: 'center',
+};
+
+const messageBoxButtonStyle = {
+    padding: '0.5rem 1.5rem',
+    backgroundColor: '#3182CE',
+    color: '#FFFFFF',
+    borderRadius: '0.375rem',
+    cursor: 'pointer',
+    border: 'none',
+    outline: 'none',
+    transition: 'background-color 0.15s ease-in-out',
+};
+
+const footerStyle = {
+    backgroundColor: '#2D3748', // Gray-800
+    color: '#FFFFFF',
+    padding: '1.5rem 0',
+    marginTop: 'auto',
+    borderRadius: '0.5rem 0.5rem 0 0',
+};
+
+const footerContentStyle = {
+    maxWidth: '72rem',
+    margin: '0 auto',
+    padding: '0 1.5rem',
+    textAlign: 'center',
+};
+
+const footerLinksStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '1rem',
+    marginTop: '0.5rem',
+};
+
+const footerLinkStyle = {
+    color: '#A0AEC0', // Gray-400
+    textDecoration: 'none',
+    transition: 'color 0.15s ease-in-out',
+};
+
+const mainContentStyle = {
+    flexGrow: 1,
+    maxWidth: '72rem',
+    margin: '0 auto',
+    padding: '3rem 1.5rem',
+};
+
+const heroSectionStyle = {
+    position: 'relative',
+    backgroundColor: '#3182CE', // Blue-600 to Purple-600 gradient
+    color: '#FFFFFF',
+    padding: '5rem 1.5rem',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    borderRadius: '0 0 0.75rem 0.75rem',
+    boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)',
+};
+
+const heroOverlayStyle = {
+    position: 'absolute',
+    inset: 0,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    opacity: 0.2,
+};
+
+const heroContentStyle = {
+    position: 'relative',
+    zIndex: 10,
+};
+
+const heroTitleStyle = {
+    fontSize: '2.25rem', // md:text-6xl
+    fontWeight: '800',
+    lineHeight: '1.25',
+    marginBottom: '1.5rem',
+    textShadow: '0 2px 4px rgba(0, 0, 0, 0.25)',
+};
+
+const heroSubtitleStyle = {
+    fontSize: '1.125rem', // md:text-xl
+    marginBottom: '2.5rem',
+    maxWidth: '42rem',
+    margin: '0 auto 2.5rem',
+    opacity: 0.9,
+};
+
+const heroButtonsContainerStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+    justifyContent: 'center',
+};
+
+const heroPrimaryButtonStyle = {
+    padding: '1rem 2rem',
+    backgroundColor: '#FFFFFF',
+    color: '#3182CE', // Blue-700
+    borderRadius: '9999px', // Full rounded
+    fontWeight: 'bold',
+    fontSize: '1.125rem',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    cursor: 'pointer',
+    outline: 'none',
+    transition: 'transform 0.3s ease-in-out, background-color 0.3s ease-in-out',
+};
+
+const heroSecondaryButtonStyle = {
+    padding: '1rem 2rem',
+    border: '2px solid #FFFFFF',
+    color: '#FFFFFF',
+    borderRadius: '9999px',
+    fontWeight: 'bold',
+    fontSize: '1.125rem',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    cursor: 'pointer',
+    outline: 'none',
+    transition: 'transform 0.3s ease-in-out, background-color 0.3s ease-in-out, color 0.3s ease-in-out',
+};
+
+const sectionStyle = {
+    maxWidth: '72rem',
+    margin: '0 auto',
+    padding: '4rem 1.5rem',
+};
+
+const altSectionStyle = {
+    backgroundColor: '#F7FAFC', // Gray-100
+    padding: '4rem 1.5rem',
+    borderRadius: '0.75rem',
+    boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.06)',
+};
+
+const sectionTitleStyle = {
+    fontSize: '2.25rem',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#2D3748',
+    marginBottom: '3rem',
+};
+
+const gridContainerStyle = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+    gap: '2rem',
+};
+
+const cardStyle = {
+    backgroundColor: '#FFFFFF',
+    borderRadius: '0.75rem',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    overflow: 'hidden',
+    cursor: 'pointer',
+    transition: 'transform 0.3s ease-in-out',
+};
+
+const cardImageStyle = {
+    width: '100%',
+    height: '12rem', // h-48
+    objectFit: 'cover',
+};
+
+const cardContentStyle = {
+    padding: '1rem',
+    width: '100%',
+    boxSizing: 'border-box',
+    overflow: 'hidden',
+};
+
+const cardTitleStyle = {
+    fontWeight: '600',
+    fontSize: '1.25rem',
+    color: '#2D3748',
+    marginBottom: '0.5rem',
+};
+
+const cardDescriptionStyle = {
+    color: '#4A5568',
+    fontSize: '0.875rem',
+};
+
+const cardFooterStyle = {
+    marginTop: '1rem',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+};
+
+const cardPointsStyle = {
+    color: '#3182CE', // Blue-600
+    fontWeight: 'bold',
+};
+
+const cardButtonStyle = {
+    padding: '0.5rem 1rem',
+    backgroundColor: '#3182CE', // Blue-500
+    color: '#FFFFFF',
+    borderRadius: '0.375rem',
+    fontSize: '0.875rem',
+    cursor: 'pointer',
+    border: 'none',
+    outline: 'none',
+    transition: 'background-color 0.15s ease-in-out',
+};
+
+const categoryGridStyle = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+    gap: '1.5rem',
+};
+
+const categoryCardStyle = {
+    backgroundColor: '#FFFFFF',
+    borderRadius: '0.5rem',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+    padding: '1.5rem',
+    textAlign: 'center',
+    cursor: 'pointer',
+    transition: 'transform 0.3s ease-in-out',
+};
+
+const categoryImageStyle = {
+    margin: '0 auto 1rem',
+    borderRadius: '9999px', // Full rounded
+    width: '6.25rem', // 100px
+    height: '6.25rem', // 100px
+};
+
+const categoryTitleStyle = {
+    fontWeight: '600',
+    fontSize: '1.125rem',
+    color: '#2D3748',
+};
+
+const howItWorksGridStyle = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '2.5rem',
+};
+
+const howItWorksCardStyle = {
+    padding: '1.5rem',
+    backgroundColor: '#FFFFFF',
+    borderRadius: '0.5rem',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+};
+
+const howItWorksIconStyle = {
+    fontSize: '3.125rem',
+    marginBottom: '1rem',
+    color: '#3182CE', // Example color
+};
+
+const howItWorksTitleStyle = {
+    fontWeight: '600',
+    fontSize: '1.25rem',
+    color: '#2D3748',
+    marginBottom: '0.5rem',
+};
+
+const howItWorksDescriptionStyle = {
+    color: '#4A5568',
+};
+
+const spinnerStyle = {
+    border: '4px solid rgba(0, 0, 0, 0.1)',
+    borderTop: '4px solid #3182CE', // Blue-500
+    borderRadius: '50%',
+    width: '4rem',
+    height: '4rem',
+    animation: 'spin 1s linear infinite',
+    display: 'inline-block',
+};
+
+const userAvatarStyle = {
+    width: '6rem', // w-24
+    height: '6rem', // h-24
+    backgroundColor: '#BFDBFE', // Blue-200
+    borderRadius: '9999px', // Full rounded
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#2B6CB0', // Blue-700
+    fontSize: '3.125rem', // text-5xl
+    fontWeight: 'bold',
+};
+
+const userAvatarStyleSmall = {
+    width: '3rem', // w-12
+    height: '3rem', // h-12
+    backgroundColor: '#BFDBFE', // Blue-200
+    borderRadius: '9999px', // Full rounded
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#2B6CB0', // Blue-700
+    fontSize: '1.25rem', // text-xl
+    fontWeight: 'bold',
+};
+
+const userAvatarStyleBig = {
+    width: '8rem', // w-32
+    height: '8rem', // h-32
+    backgroundColor: '#BFDBFE', // Blue-200
+    borderRadius: '9999px', // Full rounded
+    objectFit: 'cover',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#2B6CB0', // Blue-700
+    fontSize: '3.125rem', // text-2xl
+    fontWeight: 'bold',
+};
+
+const dashboardProfileSectionStyle = {
+    backgroundColor: '#FFFFFF',
+    borderRadius: '0.75rem',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    padding: '2rem',
+    marginBottom: '2.5rem',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+};
+
+const pointsButtonStyle = {
+    marginTop: '0.5rem',
+    padding: '0.5rem 1rem',
+    backgroundColor: '#3182CE', // Blue-500
+    color: '#FFFFFF',
+    borderRadius: '0.375rem',
+    cursor: 'pointer',
+    border: 'none',
+    outline: 'none',
+    transition: 'background-color 0.15s ease-in-out',
+};
+
+const emptyStateCardStyle = {
+    backgroundColor: '#FFFFFF',
+    padding: '1.5rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+    textAlign: 'center',
+    color: '#4A5568',
+};
+
+const emptyStateButtonStyle = {
+    padding: '0.75rem 1.5rem',
+    backgroundColor: '#48BB78', // Green-600
+    color: '#FFFFFF',
+    borderRadius: '0.375rem',
+    cursor: 'pointer',
+    border: 'none',
+    outline: 'none',
+    transition: 'background-color 0.15s ease-in-out',
+};
+
+const dashboardGridStyle = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '1.5rem',
+};
+
+const dashboardItemCardStyle = {
+    backgroundColor: '#FFFFFF',
+    borderRadius: '0.75rem',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    overflow: 'hidden',
+    cursor: 'pointer',
+    transition: 'transform 0.3s ease-in-out',
+};
+
+const dashboardItemImageStyle = {
+    width: '100%',
+    height: '12rem', // h-48
+    objectFit: 'cover',
+};
+
+const dashboardItemContentStyle = {
+    padding: '1rem',
+};
+
+const dashboardItemTitleStyle = {
+    fontWeight: '600',
+    fontSize: '1.25rem',
+    color: '#2D3748',
+    marginBottom: '0.5rem',
+};
+
+const dashboardItemDescriptionStyle = {
+    color: '#4A5568',
+    fontSize: '0.875rem',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+};
+
+const dashboardItemFooterStyle = {
+    marginTop: '1rem',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+};
+
+const dashboardItemPointsStyle = {
+    color: '#3182CE', // Blue-600
+    fontWeight: 'bold',
+};
+
+const dashboardItemStatusStyle = {
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    padding: '0.25rem 0.75rem',
+    borderRadius: '9999px', // Full rounded
+};
+
+const formGridStyle = {
+    display: 'grid',
+    gridTemplateColumns: '1fr', // Default to single column
+    gap: '1.5rem',
+};
+
+// Responsive form grid styles
+const formGridStyleDesktop = {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr', // Two columns on desktop
+    gap: '1.5rem',
+    width: '100%',
+    minWidth: 0,
+};
+
+const formGridStyleMobile = {
+    display: 'grid',
+    gridTemplateColumns: '1fr', // Single column on mobile
+    gap: '1rem',
+    width: '100%',
+    minWidth: 0,
+};
+
+const itemDetailContainerStyle = {
+    backgroundColor: '#FFFFFF',
+    borderRadius: '0.75rem',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    padding: '2rem',
+    display: 'grid',
+    gridTemplateColumns: '1fr', // Default to single column
+    gap: '2.5rem',
+};
+
+// Media query for itemDetailContainerStyle
+if (window.innerWidth >= 768) { // md breakpoint
+    itemDetailContainerStyle.gridTemplateColumns = '1fr 1fr';
+}
+
+const itemImageGalleryStyle = {
+    // md:col-span-1
+};
+
+const itemMainImageStyle = {
+    width: '100%',
+    height: '24rem', // h-96
+    objectFit: 'cover',
+    borderRadius: '0.5rem',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    marginBottom: '1rem',
+};
+
+const itemThumbnailsStyle = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: '0.5rem',
+};
+
+const itemThumbnailStyle = {
+    width: '100%',
+    height: '6rem', // h-24
+    objectFit: 'cover',
+    borderRadius: '0.375rem',
+    cursor: 'pointer',
+    opacity: 0.9,
+    transition: 'opacity 0.15s ease-in-out',
+};
+
+const itemDetailsContentStyle = {
+    // md:col-span-1
+};
+
+const itemTitleStyle = {
+    fontSize: '2.25rem',
+    fontWeight: 'bold',
+    color: '#2D3748',
+    marginBottom: '1rem',
+};
+
+const itemDescriptionStyle = {
+    color: '#4A5568',
+    fontSize: '1.125rem',
+    marginBottom: '1.5rem',
+    lineHeight: '1.625',
+};
+
+const itemInfoBlockStyle = {
+    marginBottom: '1.5rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.5rem',
+};
+
+const itemInfoTextStyle = {
+    color: '#4A5568',
+};
+
+const itemPointsStatusStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#EFF6FF', // Blue-50
+    padding: '1rem',
+    borderRadius: '0.5rem',
+    marginBottom: '1.5rem',
+    boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.05)',
+};
+
+const itemPointsValueStyle = {
+    fontSize: '1.875rem',
+    fontWeight: '800',
+    color: '#2B6CB0', // Blue-700
+};
+
+const itemStatusBadgeStyle = {
+    fontSize: '1.125rem',
+    fontWeight: 'bold',
+    padding: '0.5rem 1rem',
+    borderRadius: '9999px', // Full rounded
+};
+
+const uploaderInfoStyle = {
+    marginBottom: '1.5rem',
+};
+
+const uploaderInfoTitleStyle = {
+    fontSize: '1.25rem',
+    fontWeight: '600',
+    color: '#2D3748',
+    marginBottom: '0.5rem',
+};
+
+const uploaderInfoTextStyle = {
+    color: '#4A5568',
+};
+
+const itemActionButtonsStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+};
+
+const actionButtonStyle = {
+    flex: 1,
+    padding: '0.75rem 1.5rem',
+    color: '#FFFFFF',
+    borderRadius: '0.375rem',
+    fontSize: '1.125rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    border: 'none',
+    outline: 'none',
+    transition: 'background-color 0.15s ease-in-out',
+};
+
+const itemUnavailableMessageStyle = {
+    fontSize: '0.875rem',
+    color: '#EF4444', // Red-500
+    marginTop: '1rem',
+    textAlign: 'center',
+};
+
+// New/Updated Dashboard Specific Styles
+const dashboardMainContentStyle = {
+    flexGrow: 1,
+    maxWidth: '72rem',
+    margin: '0 auto',
+    padding: '2rem 1.5rem', // Adjusted padding
+};
+
+const dashboardCardStyle = {
+    backgroundColor: '#FFFFFF',
+    borderRadius: '0.75rem',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    marginBottom: '2rem', // Added margin-bottom
+};
+
+const outlineButtonStyle = {
+    padding: '0.5rem 1rem',
+    border: '1px solid #CBD5E0',
+    borderRadius: '0.375rem',
+    backgroundColor: '#FFFFFF',
+    color: '#4A5568',
+    cursor: 'pointer',
+    transition: 'background-color 0.15s ease-in-out, border-color 0.15s ease-in-out',
+};
+
+const ghostButtonStyle = {
+    padding: '0.5rem 1rem',
+    background: 'none',
+    border: 'none',
+    color: '#4A5568',
+    cursor: 'pointer',
+    transition: 'background-color 0.15s ease-in-out',
+};
+
+const badgeStyle = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '0.25rem 0.75rem',
+    borderRadius: '9999px',
+    fontSize: '0.75rem',
+    fontWeight: '600',
+    color: '#FFFFFF', // Default badge text color
+};
+
+const tabsContainerStyle = {
+    marginBottom: '2rem',
+};
+
+const tabsListStyle = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    backgroundColor: '#E2E8F0', // Gray-200
+    borderRadius: '0.5rem',
+    padding: '0.25rem',
+    marginBottom: '1.5rem',
+};
+
+const tabsTriggerStyle = {
+    padding: '0.75rem 1rem',
+    borderRadius: '0.375rem',
+    backgroundColor: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    fontWeight: '500',
+    color: '#4A5568',
+    transition: 'background-color 0.15s ease-in-out, color 0.15s ease-in-out',
+};
+
+const tabsTriggerActiveStyle = {
+    backgroundColor: '#FFFFFF',
+    color: '#2D3748',
+    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+};
+
+const tabsContentStyle = {
+    // Styles for the content area of each tab
+};
+
+const statsGridStyle = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '1.5rem',
+    marginBottom: '1.5rem',
+};
+
+const filterGridStyle = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', // Adjusted for filters
+    gap: '1rem',
+};
+
+// Styles for EditProfilePage
+const editProfileGridStyle = {
+    display: 'grid',
+    gap: '2rem',
+    gridTemplateColumns: '1fr 2fr', // Always horizontal layout
+    minHeight: 'fit-content',
+};
+
+// Responsive styles for smaller screens
+const editProfileGridStyleMobile = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2rem',
+};
+
+const cardHeaderStyle = {
+    padding: '1.25rem', // p-5
+    borderBottom: '1px solid #E2E8F0', // border-b
+    fontSize: '1.125rem', // text-lg
+    fontWeight: '600', // font-semibold
+    color: '#2D3748', // text-gray-800
+};
+
+const actionButtonCircleStyle = {
+    width: '2.5rem', // w-10
+    height: '2.5rem', // h-10
+    borderRadius: '9999px', // rounded-full
+    backgroundColor: '#3182CE', // bg-primary
+    color: '#FFFFFF', // text-white
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', // shadow
+    cursor: 'pointer',
+    border: 'none',
+    outline: 'none',
+    transition: 'background-color 0.15s ease-in-out',
+};
+
+const separatorStyle = {
+    height: '1px',
+    backgroundColor: '#E2E8F0', // border-gray-200
+    width: '100%',
+};
+
+const toggleButtonStyle = {
+    padding: '0.375rem 0.75rem', // px-3 py-1.5
+    borderRadius: '0.375rem', // rounded-md
+    fontSize: '0.875rem', // text-sm
+    fontWeight: '500', // font-medium
+    border: '1px solid transparent',
+    cursor: 'pointer',
+    transition: 'background-color 0.15s ease-in-out, color 0.15s ease-in-out, border-color 0.15s ease-in-out',
+};
+
+const headerTitleStyle = {
+    fontSize: '1.5rem',
+    fontWeight: 'bold',
+    color: '#2D3748',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    padding: 0,
+};
+
+const userIdStyle = {
+    marginLeft: '1rem',
+    fontSize: '0.875rem',
+    color: '#718096',
+};
+
+const navButtonStyle = {
+    padding: '0.5rem 1rem',
+    borderRadius: '0.375rem',
+    backgroundColor: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    fontWeight: '500',
+    color: '#4A5568',
+    transition: 'background-color 0.15s ease-in-out, color 0.15s ease-in-out',
+};
+
+const primaryNavButtonStyle = {
+    padding: '0.5rem 1rem',
+    borderRadius: '0.375rem',
+    backgroundColor: '#3182CE',
+    color: '#FFFFFF',
+    border: 'none',
+    cursor: 'pointer',
+    fontWeight: '500',
+    transition: 'background-color 0.15s ease-in-out',
+};
+
+const userEmailStyle = {
+    fontSize: '0.875rem',
+    color: '#4A5568',
+    marginRight: '1rem',
+};
+
+const logoutButtonStyle = {
+    padding: '0.5rem 1rem',
+    borderRadius: '0.375rem',
+    backgroundColor: '#EF4444', // Red-500
+    color: '#FFFFFF',
+    border: 'none',
+    cursor: 'pointer',
+    fontWeight: '500',
+    transition: 'background-color 0.15s ease-in-out',
+};
+
+const flexRowWrapStyle = {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: '1rem',
+    justifyContent: 'space-between', // Adjust as needed
+    alignItems: 'flex-start', // Adjust as needed
+};
+
+// Keyframe for spinner animation
+const styleSheet = document.createElement('style');
+styleSheet.type = 'text/css';
+styleSheet.innerText = `
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+`;
+document.head.appendChild(styleSheet);
 
 // Define the base URL for your MERN backend API
 // Make sure your backend server is running on this URL (e.g., http://localhost:5000)
@@ -76,10 +1020,12 @@ const AuthProvider = ({ children }) => {
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 setToken(data.token);
+                // Store role in user state
+                setUser({ id: data.userId, email, role: data.role });
                 // Fetch user data after successful login to populate user state
                 await fetchUserData(data.token);
                 console.log("[AuthContext] Login successful.");
-                return { success: true, message: data.msg };
+                return { success: true, message: data.msg, role: data.role };
             } else {
                 console.error("[AuthContext] Login failed:", data.msg);
                 return { success: false, message: data.msg || 'Login failed' };
@@ -132,7 +1078,7 @@ const AuthProvider = ({ children }) => {
 
     // Provide the auth functions, user data, and loading state to children components
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, token, loading, login, register, logout, setUser }}>
             {children}
         </AuthContext.Provider>
     );
@@ -167,14 +1113,18 @@ const LoginPage = ({ onLoginSuccess, onNavigate }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
-    const { login } = useAuth(); // Use the login function from AuthContext
+    const { login, setUser } = useAuth(); // Use the login function from AuthContext
 
     const handleLogin = async (e) => {
         e.preventDefault();
         const result = await login(email, password);
         if (result.success) {
             setMessage(result.message);
-            onLoginSuccess();
+            if (result.role === 'admin') {
+                onNavigate('admin-panel');
+            } else {
+                onLoginSuccess();
+            }
         } else {
             setMessage(result.message);
         }
@@ -321,20 +1271,51 @@ const RegisterPage = ({ onRegisterSuccess, onNavigate }) => {
 };
 
 const Header = ({ onNavigate, user, onLogout }) => {
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768); // Adjust breakpoint as needed
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsDesktop(window.innerWidth >= 768); // Update state on resize
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const headerDynamicStyle = {
+        backgroundColor: '#FFFFFF',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        padding: '1rem 1.5rem',
+        display: 'flex',
+        flexDirection: isDesktop ? 'row' : 'column', // Horizontal on desktop, vertical on mobile
+        justifyContent: 'space-between',
+        alignItems: isDesktop ? 'center' : 'flex-start', // Align items based on direction
+        borderRadius: '0 0 0.5rem 0.5rem',
+        gap: isDesktop ? '0' : '1rem', // Gap for vertical stacking on mobile
+    };
+
+    const navDynamicStyle = {
+        display: 'flex',
+        flexDirection: isDesktop ? 'row' : 'column', // Horizontal on desktop, vertical on mobile
+        alignItems: isDesktop ? 'center' : 'flex-start', // Align items based on direction
+        gap: '1rem',
+        width: isDesktop ? 'auto' : '100%', // Full width on mobile
+        marginTop: isDesktop ? '0' : '1rem', // Margin for vertical stacking on mobile
+    };
+
     return (
-        <header style={headerStyle}>
+        <header style={headerDynamicStyle}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
                 <button onClick={() => onNavigate('landing')} style={headerTitleStyle}>
                     ReWear
                 </button>
                 {/* Display userId for multi-user identification */}
                 {user && user.id && (
-                    <span style={userIdStyle}>
+                    <span style={{ ...userIdStyle, display: isDesktop ? 'block' : 'none' }}>
                         User ID: <span style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{user.id}</span>
                     </span>
                 )}
             </div>
-            <nav style={navStyle}>
+            <nav style={navDynamicStyle}>
                 <button onClick={() => onNavigate('landing')} style={navButtonStyle}>Home</button>
                 <button onClick={() => onNavigate('browse')} style={navButtonStyle}>Browse Items</button>
                 {user ? (
@@ -349,6 +1330,9 @@ const Header = ({ onNavigate, user, onLogout }) => {
                         <button onClick={() => onNavigate('login')} style={navButtonStyle}>Login</button>
                         <button onClick={() => onNavigate('register')} style={primaryNavButtonStyle}>Sign Up</button>
                     </>
+                )}
+                {user && user.role === 'admin' && (
+                    <button onClick={() => onNavigate('admin-panel')} style={navButtonStyle}>Admin Panel</button>
                 )}
             </nav>
         </header>
@@ -569,44 +1553,40 @@ const Dashboard = ({ onNavigate }) => {
                     <p style={{ color: '#718096' }}>Manage your ReWear account and track your activity</p>
                 </div>
 
-                {/* Profile Overview */}
-                <div style={dashboardCardStyle}>
-                    <div style={{ padding: '1.5rem' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '1.5rem' }}>
-                            <div style={userAvatarStyle}>
-                                {user.email ? user.email.charAt(0).toUpperCase() : 'U'}
+                {/* Profile Overview - Horizontal Layout */}
+                <div style={{ ...dashboardCardStyle, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2rem', padding: '1.5rem', flexWrap: 'wrap' }}>
+                    <div style={userAvatarStyle}>
+                        {user.email ? user.email.charAt(0).toUpperCase() : 'U'}
+                    </div>
+
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#2D3748' }}>{user.email || 'Guest User'}</h2>
+                        <p style={{ color: '#718096' }}>Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</p>
+                        <p style={{ color: '#718096', fontSize: '0.875rem' }}>User ID: <span style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{user.id}</span></p>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', paddingTop: '0.5rem', flexWrap: 'wrap' }}>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#3182CE' }}>{points}</div>
+                                <div style={{ fontSize: '0.875rem', color: '#718096' }}>Points</div>
                             </div>
-
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#2D3748' }}>{user.email || 'Guest User'}</h2>
-                                <p style={{ color: '#718096' }}>Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</p>
-                                <p style={{ color: '#718096', fontSize: '0.875rem' }}>User ID: <span style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{user.id}</span></p>
-
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', paddingTop: '0.5rem' }}>
-                                    <div style={{ textAlign: 'center' }}>
-                                        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#3182CE' }}>{points}</div>
-                                        <div style={{ fontSize: '0.875rem', color: '#718096' }}>Points</div>
-                                    </div>
-                                    <div style={{ textAlign: 'center' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
-                                            <Star style={{ width: '1rem', height: '1rem', fill: '#F6E05E', color: '#F6E05E' }} />
-                                            <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>N/A</span> {/* Rating not implemented */}
-                                        </div>
-                                        <div style={{ fontSize: '0.875rem', color: '#718096' }}>Rating</div>
-                                    </div>
-                                    <div style={{ textAlign: 'center' }}>
-                                        <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{listings.length}</div> {/* Total items listed */}
-                                        <div style={{ fontSize: '0.875rem', color: '#718096' }}>Items Listed</div>
-                                    </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                                    <Star style={{ width: '1rem', height: '1rem', fill: '#F6E05E', color: '#F6E05E' }} />
+                                    <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>N/A</span> {/* Rating not implemented */}
                                 </div>
+                                <div style={{ fontSize: '0.875rem', color: '#718096' }}>Rating</div>
                             </div>
-
-                            <button onClick={() => onNavigate('edit-profile')} style={{ ...outlineButtonStyle, alignSelf: 'flex-end' }}>
-                                <Edit style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
-                                Edit Profile
-                            </button>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{listings.length}</div> {/* Total items listed */}
+                                <div style={{ fontSize: '0.875rem', color: '#718096' }}>Items Listed</div>
+                            </div>
                         </div>
                     </div>
+
+                    <button onClick={() => onNavigate('edit-profile')} style={{ ...outlineButtonStyle, alignSelf: 'flex-end' }}>
+                        <Edit style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
+                        Edit Profile
+                    </button>
                 </div>
 
                 {/* Tabs */}
@@ -623,6 +1603,24 @@ const Dashboard = ({ onNavigate }) => {
                             style={{ ...tabsTriggerStyle, ...(activeTab === 'swaps' && tabsTriggerActiveStyle) }}
                         >
                             Swap History
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('points')}
+                            style={{ ...tabsTriggerStyle, ...(activeTab === 'points' && tabsTriggerActiveStyle) }}
+                        >
+                            Points History
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('ratings')}
+                            style={{ ...tabsTriggerStyle, ...(activeTab === 'ratings' && tabsTriggerActiveStyle) }}
+                        >
+                            Ratings
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('notifications')}
+                            style={{ ...tabsTriggerStyle, ...(activeTab === 'notifications' && tabsTriggerActiveStyle) }}
+                        >
+                            Notifications
                         </button>
                         <button
                             onClick={() => setActiveTab('stats')}
@@ -664,8 +1662,18 @@ const Dashboard = ({ onNavigate }) => {
                                                     style={dashboardItemImageStyle}
                                                 />
                                                 <div style={{ position: 'absolute', top: '0.75rem', left: '0.75rem' }}>
-                                                    <span style={{ ...badgeStyle, backgroundColor: item.status === 'available' ? '#48BB78' : '#F6AD55' }}>
-                                                        {item.status || 'Available'}
+                                                    <span style={{ 
+                                                        ...badgeStyle, 
+                                                        backgroundColor: 
+                                                            item.status === 'approved' ? '#48BB78' : 
+                                                            item.status === 'pending' ? '#F6AD55' : 
+                                                            item.status === 'rejected' ? '#F56565' : 
+                                                            '#E2E8F0'
+                                                    }}>
+                                                        {item.status === 'approved' ? 'Approved' :
+                                                         item.status === 'pending' ? 'Pending Review' :
+                                                         item.status === 'rejected' ? 'Rejected' :
+                                                         item.status || 'Unknown'}
                                                     </span>
                                                 </div>
                                             </div>
@@ -756,6 +1764,46 @@ const Dashboard = ({ onNavigate }) => {
                         </div>
                     )}
 
+                    {/* Points History Tab Content */}
+                    {activeTab === 'points' && (
+                        <div style={tabsContentStyle}>
+                            <PointsHistory />
+                        </div>
+                    )}
+
+                    {/* Ratings Tab Content */}
+                    {activeTab === 'ratings' && (
+                        <div style={tabsContentStyle}>
+                            <RatingsPage />
+                        </div>
+                    )}
+
+                    {/* Notifications Tab Content (Placeholder) */}
+                    {activeTab === 'notifications' && (
+                        <div style={tabsContentStyle}>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem' }}>My Notifications</h3>
+                            <div style={emptyStateCardStyle}>
+                                <p style={{ marginBottom: '1rem' }}>No new notifications.</p>
+                                <p style={{ fontSize: '0.875rem', color: '#718096' }}>
+                                    You'll receive updates here about swap requests, status changes, and new ratings.
+                                </p>
+                            </div>
+                            {/* Example of a notification item - you'd fetch these from backend */}
+                            {/*
+                            <div style={dashboardCardStyle}>
+                                <div style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <Bell style={{ width: '1.5rem', height: '1.5rem', color: '#3182CE' }} />
+                                    <div>
+                                        <h4 style={{ fontWeight: '500' }}>Swap Request Accepted!</h4>
+                                        <p style={{ fontSize: '0.875rem', color: '#718096' }}>Your request for "Vintage T-Shirt" was accepted by Jane Doe. View details.</p>
+                                        <span style={{ fontSize: '0.75rem', color: '#A0AEC0' }}>2 hours ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                            */}
+                        </div>
+                    )}
+
                     {/* Statistics Tab Content */}
                     {activeTab === 'stats' && (
                         <div style={tabsContentStyle}>
@@ -830,7 +1878,6 @@ const BrowseItemsPage = ({ onNavigate }) => {
     const [likedItems, setLikedItems] = useState([]); // Client-side only for now
 
     const categories = ['Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Accessories', 'Footwear'];
-    const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL']; // Example sizes
     const conditions = ['New with tags', 'Like new', 'Good', 'Fair'];
 
     useEffect(() => {
@@ -865,7 +1912,7 @@ const BrowseItemsPage = ({ onNavigate }) => {
                               item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                               (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())));
         const matchesCategory = selectedCategory === "all" || item.category === selectedCategory;
-        const matchesSize = selectedSize === "all" || item.size === selectedSize;
+        const matchesSize = selectedSize === "all" || item.size.toLowerCase().includes(selectedSize.toLowerCase()); // Changed for text input
         const matchesCondition = selectedCondition === "all" || item.condition === selectedCondition;
 
         return matchesSearch && matchesCategory && matchesSize && matchesCondition;
@@ -931,14 +1978,13 @@ const BrowseItemsPage = ({ onNavigate }) => {
                             {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                         </select>
 
-                        <select
-                            value={selectedSize}
+                        <input // Changed from select to input for size
+                            type="text"
+                            placeholder="Size (e.g., M, 32)"
+                            value={selectedSize === "all" ? "" : selectedSize}
                             onChange={(e) => setSelectedSize(e.target.value)}
                             style={inputStyle}
-                        >
-                            <option value="all">All Sizes</option>
-                            {sizes.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
+                        />
 
                         <select
                             value={selectedCondition}
@@ -1066,7 +2112,7 @@ const AddNewItemPage = ({ onNavigate }) => {
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
     const [type, setType] = useState('');
-    const [size, setSize] = useState('');
+    const [size, setSize] = useState(''); // Changed to text input
     const [condition, setCondition] = useState('');
     const [tags, setTags] = useState('');
     const [points, setPoints] = useState('');
@@ -1076,7 +2122,7 @@ const AddNewItemPage = ({ onNavigate }) => {
 
     const categories = ['Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Accessories', 'Footwear'];
     const conditions = ['New with tags', 'Like new', 'Good', 'Fair'];
-    const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL']; // Example sizes
+    // Removed sizes array as it's now a text input
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -1099,7 +2145,7 @@ const AddNewItemPage = ({ onNavigate }) => {
                     description,
                     category,
                     type,
-                    size,
+                    size, // Send size as text
                     condition,
                     tags: tags, // Send tags as is, backend will process
                     points: parseInt(points),
@@ -1107,26 +2153,77 @@ const AddNewItemPage = ({ onNavigate }) => {
                 }),
             });
             
-            console.log("[AddNewItemPage] Response received. response.ok:", response.ok);
-            const data = await response.json();
-            console.log("[AddNewItemPage] Response data:", data);
+            console.log("[AddNewItemPage] Raw response status:", response.status);
+            console.log("[AddNewItemPage] Raw response ok:", response.ok);
+
+            const responseText = await response.text();
+            console.log("[AddNewItemPage] Raw response text:", responseText);
+
+            let data;
+            if (responseText) { // Only try to parse if there's text
+                try {
+                    data = JSON.parse(responseText);
+                } catch (jsonError) {
+                    console.error("[AddNewItemPage] JSON parsing error:", jsonError);
+                    if (response.ok) { // If status is OK but JSON is bad
+                        setMessage("Item listed successfully! There was an issue parsing the server's response, but the item should be added.");
+                        setTitle(''); setDescription(''); setCategory(''); setType(''); setSize('');
+                        setCondition(''); setTags(''); setPoints(''); setImageUrl('');
+                        onNavigate('dashboard');
+                        return;
+                    } else { // If status is not OK and JSON is bad
+                        setMessage(`Failed to list item: Invalid server response. Status: ${response.status}`);
+                        return;
+                    }
+                }
+            }
 
             if (response.ok) {
-                setMessage(`Item listed successfully! You earned ${data.newPoints - (user.points || 0)} points.`);
+                setMessage(`Item listed successfully! You earned ${data?.newPoints - (user.points || 0) || 'some'} points. Your item is now pending admin approval and will be visible to the community once approved.`);
                 // Clear form
                 setTitle(''); setDescription(''); setCategory(''); setType(''); setSize('');
                 setCondition(''); setTags(''); setPoints(''); setImageUrl('');
                 onNavigate('dashboard'); // Redirect to dashboard
             } else {
-                setMessage(`Failed to list item: ${data.msg || 'Unknown error'}`);
-                console.error("[AddNewItemPage] Failed to list item (response not OK):", data.msg);
+                setMessage(`Failed to list item: ${data?.msg || 'Unknown error'}`);
+                console.error("[AddNewItemPage] Failed to list item (response not OK):", data?.msg || responseText);
             }
         } catch (error) {
-            console.error("[AddNewItemPage] Error adding item:", error);
+            console.error("[AddNewItemPage] Network or unexpected error:", error);
             setMessage("Network error listing item. Please check your connection or try again.");
         } finally {
             setLoading(false);
             console.log("[AddNewItemPage] Loading set to false.");
+        }
+    };
+
+    const handleImageChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('image', file);
+
+        setLoading(true);
+        setMessage('');
+        try {
+            const response = await fetch(`${API_BASE_URL}/upload`, {
+                method: 'POST',
+                headers: {
+                    'x-auth-token': token
+                },
+                body: formData
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setImageUrl(data.imageUrl);
+                setMessage('Image uploaded successfully!');
+            } else {
+                setMessage(data.msg || 'Image upload failed');
+            }
+        } catch (error) {
+            setMessage('Image upload error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -1201,17 +2298,16 @@ const AddNewItemPage = ({ onNavigate }) => {
                                 />
                             </div>
                             <div>
-                                <label htmlFor="size" style={labelStyle}>Size (e.g., M, L, 32)</label>
-                                <select
+                                <label htmlFor="size" style={labelStyle}>Size (e.g., M, L, 34, 32)</label>
+                                <input // Changed from select to input
+                                    type="text"
                                     id="size"
                                     style={inputStyle}
+                                    placeholder="e.g., M, L, 34, 32"
                                     value={size}
                                     onChange={(e) => setSize(e.target.value)}
                                     required
-                                >
-                                    <option value="">Select size</option>
-                                    {sizes.map(s => <option key={s} value={s}>{s}</option>)}
-                                </select>
+                                />
                             </div>
                             <div>
                                 <label htmlFor="condition" style={labelStyle}>Condition</label>
@@ -1619,6 +2715,16 @@ const EditProfilePage = ({ onNavigate }) => {
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+    // Add responsive handling
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -1770,9 +2876,9 @@ const EditProfilePage = ({ onNavigate }) => {
                     </div>
                 </div>
 
-                <div style={editProfileGridStyle}>
+                <div style={isMobile ? editProfileGridStyleMobile : editProfileGridStyle}>
                     {/* Profile Picture & Basic Info */}
-                    <div style={{ gridColumn: 'span 1' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: isMobile ? '100%' : '300px', maxWidth: isMobile ? '100%' : '350px' }}>
                         <div style={dashboardCardStyle}>
                             <div style={cardHeaderStyle}>
                                 <h3 style={cardTitleStyle}>Profile Picture</h3>
@@ -1818,7 +2924,7 @@ const EditProfilePage = ({ onNavigate }) => {
                     </div>
 
                     {/* Edit Form */}
-                    <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1 }}>
                         {/* Personal Information */}
                         <div style={dashboardCardStyle}>
                             <div style={cardHeaderStyle}>
@@ -1828,7 +2934,7 @@ const EditProfilePage = ({ onNavigate }) => {
                                 </h3>
                             </div>
                             <div style={{ ...cardContentStyle, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                <div style={formGridStyle}>
+                                <div style={isMobile ? formGridStyleMobile : formGridStyleDesktop}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                                         <label htmlFor="name" style={labelStyle}>Full Name</label>
                                         <input
@@ -1854,7 +2960,7 @@ const EditProfilePage = ({ onNavigate }) => {
                                     </div>
                                 </div>
 
-                                <div style={formGridStyle}>
+                                <div style={isMobile ? formGridStyleMobile : formGridStyleDesktop}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                                         <label htmlFor="phone" style={labelStyle}>Phone Number</label>
                                         <input
@@ -1883,8 +2989,12 @@ const EditProfilePage = ({ onNavigate }) => {
                                     <label htmlFor="bio" style={labelStyle}>Bio</label>
                                     <textarea
                                         id="bio"
-                                        rows="4"
-                                        style={{ ...inputStyle, minHeight: '6.25rem' }} // min-h-[100px]
+                                        rows={isMobile ? "3" : "4"}
+                                        style={{ 
+                                            ...inputStyle, 
+                                            minHeight: isMobile ? '4.5rem' : '6.25rem',
+                                            resize: 'vertical'
+                                        }}
                                         value={profile.bio}
                                         onChange={(e) => handleInputChange('bio', e.target.value)}
                                         placeholder="Tell us about yourself and your interest in sustainable fashion..."
@@ -1903,15 +3013,27 @@ const EditProfilePage = ({ onNavigate }) => {
                                 <h3 style={cardTitleStyle}>Privacy & Preferences</h3>
                             </div>
                             <div style={{ ...cardContentStyle, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <div>
+                                <div style={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'space-between',
+                                    flexDirection: isMobile ? 'column' : 'row',
+                                    gap: isMobile ? '0.75rem' : '0',
+                                    alignItems: isMobile ? 'stretch' : 'center'
+                                }}>
+                                    <div style={{ textAlign: isMobile ? 'center' : 'left' }}>
                                         <h4 style={{ fontWeight: '500' }}>Email Notifications</h4>
                                         <p style={{ fontSize: '0.875rem', color: '#718096' }}>
                                             Receive updates about swaps and new items
                                         </p>
                                     </div>
                                     <button
-                                        style={{ ...toggleButtonStyle, backgroundColor: profile.preferences.notifications ? '#3182CE' : '#E2E8F0', color: profile.preferences.notifications ? '#FFFFFF' : '#4A5568' }}
+                                        style={{ 
+                                            ...toggleButtonStyle, 
+                                            backgroundColor: profile.preferences.notifications ? '#3182CE' : '#E2E8F0', 
+                                            color: profile.preferences.notifications ? '#FFFFFF' : '#4A5568',
+                                            width: isMobile ? '100%' : 'auto'
+                                        }}
                                         onClick={() => handlePreferenceChange('notifications', !profile.preferences.notifications)}
                                     >
                                         {profile.preferences.notifications ? "Enabled" : "Disabled"}
@@ -1920,15 +3042,27 @@ const EditProfilePage = ({ onNavigate }) => {
 
                                 <div style={separatorStyle}></div>
 
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <div>
+                                <div style={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'space-between',
+                                    flexDirection: isMobile ? 'column' : 'row',
+                                    gap: isMobile ? '0.75rem' : '0',
+                                    alignItems: isMobile ? 'stretch' : 'center'
+                                }}>
+                                    <div style={{ textAlign: isMobile ? 'center' : 'left' }}>
                                         <h4 style={{ fontWeight: '500' }}>Public Profile</h4>
                                         <p style={{ fontSize: '0.875rem', color: '#718096' }}>
                                             Make your profile visible to other users
                                         </p>
                                     </div>
                                     <button
-                                        style={{ ...toggleButtonStyle, backgroundColor: profile.preferences.publicProfile ? '#3182CE' : '#E2E8F0', color: profile.preferences.publicProfile ? '#FFFFFF' : '#4A5568' }}
+                                        style={{ 
+                                            ...toggleButtonStyle, 
+                                            backgroundColor: profile.preferences.publicProfile ? '#3182CE' : '#E2E8F0', 
+                                            color: profile.preferences.publicProfile ? '#FFFFFF' : '#4A5568',
+                                            width: isMobile ? '100%' : 'auto'
+                                        }}
                                         onClick={() => handlePreferenceChange('publicProfile', !profile.preferences.publicProfile)}
                                     >
                                         {profile.preferences.publicProfile ? "Public" : "Private"}
@@ -1937,15 +3071,27 @@ const EditProfilePage = ({ onNavigate }) => {
 
                                 <div style={separatorStyle}></div>
 
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <div>
+                                <div style={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'space-between',
+                                    flexDirection: isMobile ? 'column' : 'row',
+                                    gap: isMobile ? '0.75rem' : '0',
+                                    alignItems: isMobile ? 'stretch' : 'center'
+                                }}>
+                                    <div style={{ textAlign: isMobile ? 'center' : 'left' }}>
                                         <h4 style={{ fontWeight: '500' }}>Show Location</h4>
                                         <p style={{ fontSize: '0.875rem', color: '#718096' }}>
                                             Display your city to help with local swaps
                                         </p>
                                     </div>
                                     <button
-                                        style={{ ...toggleButtonStyle, backgroundColor: profile.preferences.showLocation ? '#3182CE' : '#E2E8F0', color: profile.preferences.showLocation ? '#FFFFFF' : '#4A5568' }}
+                                        style={{ 
+                                            ...toggleButtonStyle, 
+                                            backgroundColor: profile.preferences.showLocation ? '#3182CE' : '#E2E8F0', 
+                                            color: profile.preferences.showLocation ? '#FFFFFF' : '#4A5568',
+                                            width: isMobile ? '100%' : 'auto'
+                                        }}
                                         onClick={() => handlePreferenceChange('showLocation', !profile.preferences.showLocation)}
                                     >
                                         {profile.preferences.showLocation ? "Visible" : "Hidden"}
@@ -1955,12 +3101,33 @@ const EditProfilePage = ({ onNavigate }) => {
                         </div>
 
                         {/* Action Buttons */}
-                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                            <button onClick={() => onNavigate('dashboard')} style={outlineButtonStyle}>Cancel</button>
+                        <div style={{ 
+                            display: 'flex', 
+                            gap: '1rem', 
+                            justifyContent: isMobile ? 'stretch' : 'flex-end',
+                            flexDirection: isMobile ? 'column' : 'row'
+                        }}>
+                            <button 
+                                onClick={() => onNavigate('dashboard')} 
+                                style={{ 
+                                    ...outlineButtonStyle, 
+                                    width: isMobile ? '100%' : 'auto',
+                                    order: isMobile ? 2 : 1
+                                }}
+                            >
+                                Cancel
+                            </button>
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                style={{ ...primaryButtonStyle, width: 'auto', display: 'inline-flex', alignItems: 'center', padding: '0.75rem 1.5rem' }}
+                                style={{ 
+                                    ...primaryButtonStyle, 
+                                    width: isMobile ? '100%' : 'auto', 
+                                    display: 'inline-flex', 
+                                    alignItems: 'center', 
+                                    padding: '0.75rem 1.5rem',
+                                    order: isMobile ? 1 : 2
+                                }}
                             >
                                 <Save style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
                                 {isSaving ? "Saving..." : "Save Changes"}
@@ -1976,6 +3143,1303 @@ const EditProfilePage = ({ onNavigate }) => {
     );
 };
 
+// New PointsHistory Component
+const PointsHistory = () => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterType, setFilterType] = useState('all');
+    const [filterCategory, setFilterCategory] = useState('all');
+    const [dateFrom, setDateFrom] = useState(null);
+    const [dateTo, setDateTo] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5; // Reduced for better display in smaller screen
+
+    // Mock user balance and stats
+    const userStats = {
+        currentBalance: 1250,
+        totalEarned: 3450,
+        totalSpent: 2200,
+        thisMonth: {
+            earned: 450,
+            spent: 320
+        }
+    };
+
+    // Mock transaction data
+    const [transactions] = useState([
+        {
+            id: '1',
+            type: 'earn',
+            amount: 100,
+            reason: 'Completed Swap',
+            description: 'Earned points for successful swap completion',
+            itemName: 'Vintage Leather Jacket',
+            swapId: 'swap_001',
+            date: '2024-01-12',
+            category: 'swap',
+            status: 'completed'
+        },
+        {
+            id: '2',
+            type: 'spend',
+            amount: 50,
+            reason: 'Premium Listing',
+            description: 'Featured your item for better visibility',
+            itemName: 'Designer Handbag',
+            date: '2024-01-11',
+            category: 'purchase',
+            status: 'completed'
+        },
+        {
+            id: '3',
+            type: 'earn',
+            amount: 200,
+            reason: 'First Swap Bonus',
+            description: 'Welcome bonus for completing your first swap',
+            swapId: 'swap_002',
+            date: '2024-01-10',
+            category: 'bonus',
+            status: 'completed'
+        },
+        {
+            id: '4',
+            type: 'earn',
+            amount: 75,
+            reason: 'Referral Bonus',
+            description: 'Friend joined using your referral code',
+            date: '2024-01-09',
+            category: 'referral',
+            status: 'completed'
+        },
+        {
+            id: '5',
+            type: 'spend',
+            amount: 30,
+            reason: 'Item Boost',
+            description: 'Boosted visibility for faster swaps',
+            itemName: 'Sneaker Collection',
+            date: '2024-01-08',
+            category: 'purchase',
+            status: 'completed'
+        },
+        {
+            id: '6',
+            type: 'earn',
+            amount: 150,
+            reason: 'Monthly Challenge',
+            description: 'Completed 5 swaps this month',
+            date: '2024-01-07',
+            category: 'promotion',
+            status: 'completed'
+        },
+        {
+            id: '7',
+            type: 'spend',
+            amount: 25,
+            reason: 'Priority Support',
+            description: 'Premium customer support access',
+            date: '2024-01-06',
+            category: 'purchase',
+            status: 'pending'
+        }
+    ]);
+
+    const getTransactionIcon = (category, type) => {
+        const iconStyle = { height: '1rem', width: '1rem', color: type === 'earn' ? '#48BB78' : '#F6AD55' }; // Green for earn, Orange for spend
+        
+        switch (category) {
+            case 'swap':
+                return <RefreshCw style={iconStyle} />;
+            case 'bonus':
+                return <Gift style={iconStyle} />;
+            case 'referral':
+                return <Award style={iconStyle} />;
+            case 'purchase':
+                return <ShoppingBag style={iconStyle} />;
+            case 'promotion':
+                return <TrendingUp style={iconStyle} />;
+            default:
+                return <Coins style={iconStyle} />;
+        }
+    };
+
+    const getStatusBadge = (status) => {
+        let backgroundColor, color;
+        switch (status) {
+            case 'completed':
+                backgroundColor = '#48BB78'; // Green
+                color = '#FFFFFF';
+                break;
+            case 'pending':
+                backgroundColor = '#F6E05E'; // Yellow
+                color = '#2D3748';
+                break;
+            case 'failed':
+                backgroundColor = '#EF4444'; // Red
+                color = '#FFFFFF';
+                break;
+            default:
+                backgroundColor = '#E2E8F0'; // Gray
+                color = '#4A5568';
+        }
+        return <span style={{ ...badgeStyle, backgroundColor, color, padding: '0.25rem 0.6rem', borderRadius: '0.25rem' }}>{status.charAt(0).toUpperCase() + status.slice(1)}</span>;
+    };
+
+    const filteredTransactions = transactions.filter(transaction => {
+        const matchesSearch = transaction.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                              transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                              (transaction.itemName && transaction.itemName.toLowerCase().includes(searchTerm.toLowerCase()));
+        
+        const matchesType = filterType === 'all' || transaction.type === filterType;
+        const matchesCategory = filterCategory === 'all' || transaction.category === filterCategory;
+        
+        const transactionDate = new Date(transaction.date);
+        const matchesDateFrom = !dateFrom || transactionDate >= dateFrom;
+        const matchesDateTo = !dateTo || transactionDate <= dateTo;
+        
+        return matchesSearch && matchesType && matchesCategory && matchesDateFrom && matchesDateTo;
+    });
+
+    const paginatedTransactions = filteredTransactions.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+
+    return (
+        <div style={{ padding: '1.5rem', backgroundColor: '#F7FAFC', borderRadius: '0.75rem' }}>
+            <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                {/* Header */}
+                <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                    <h1 style={{ fontSize: '2.25rem', fontWeight: 'bold', color: '#2D3748' }}>
+                        Points History
+                    </h1>
+                    <p style={{ color: '#718096' }}>
+                        Track your points earnings and spending across all activities
+                    </p>
+                </div>
+
+                {/* Stats Cards - Horizontal Layout */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center', marginBottom: '1.5rem' }}>
+                    <div style={{ ...dashboardCardStyle, flex: '1 1 calc(25% - 1rem)', minWidth: '180px', margin: 0 }}>
+                        <div style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div style={{ height: '3rem', width: '3rem', borderRadius: '9999px', backgroundColor: 'rgba(49, 130, 206, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Coins style={{ height: '1.5rem', width: '1.5rem', color: '#3182CE' }} />
+                            </div>
+                            <div>
+                                <p style={{ fontSize: '0.875rem', color: '#718096' }}>Current Balance</p>
+                                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#2D3748' }}>{userStats.currentBalance.toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ ...dashboardCardStyle, flex: '1 1 calc(25% - 1rem)', minWidth: '180px', margin: 0 }}>
+                        <div style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div style={{ height: '3rem', width: '3rem', borderRadius: '9999px', backgroundColor: 'rgba(72, 187, 120, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <TrendingUp style={{ height: '1.5rem', width: '1.5rem', color: '#48BB78' }} />
+                            </div>
+                            <div>
+                                <p style={{ fontSize: '0.875rem', color: '#718096' }}>Total Earned</p>
+                                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#48BB78' }}>{userStats.totalEarned.toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ ...dashboardCardStyle, flex: '1 1 calc(25% - 1rem)', minWidth: '180px', margin: 0 }}>
+                        <div style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div style={{ height: '3rem', width: '3rem', borderRadius: '9999px', backgroundColor: 'rgba(246, 173, 85, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <TrendingDown style={{ height: '1.5rem', width: '1.5rem', color: '#F6AD55' }} />
+                            </div>
+                            <div>
+                                <p style={{ fontSize: '0.875rem', color: '#718096' }}>Total Spent</p>
+                                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#F6AD55' }}>{userStats.totalSpent.toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ ...dashboardCardStyle, flex: '1 1 calc(25% - 1rem)', minWidth: '180px', margin: 0 }}>
+                        <div style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div style={{ height: '3rem', width: '3rem', borderRadius: '9999px', backgroundColor: 'rgba(160, 174, 192, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Plus style={{ height: '1.5rem', width: '1.5rem', color: '#A0AEC0' }} />
+                            </div>
+                            <div>
+                                <p style={{ fontSize: '0.875rem', color: '#718096' }}>This Month</p>
+                                <p style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
+                                    <span style={{ color: '#48BB78' }}>+{userStats.thisMonth.earned}</span>
+                                    <span style={{ color: '#718096', margin: '0 0.25rem' }}>/</span>
+                                    <span style={{ color: '#F6AD55' }}>-{userStats.thisMonth.spent}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Filters */}
+                <div style={{ ...dashboardCardStyle, marginBottom: '1.5rem' }}>
+                    <div style={cardHeaderStyle}>
+                        <h3 style={{ ...cardTitleStyle, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Filter style={{ height: '1.25rem', width: '1.25rem' }} />
+                            Filter Transactions
+                        </h3>
+                    </div>
+                    <div style={{ padding: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                            <label style={labelStyle}>Search</label>
+                            <div style={{ position: 'relative' }}>
+                                <Search style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#718096', width: '1rem', height: '1rem' }} />
+                                <input
+                                    type="text"
+                                    placeholder="Search transactions..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    style={{ ...inputStyle, paddingLeft: '2.5rem' }}
+                                />
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                            <label style={labelStyle}>Type</label>
+                            <select value={filterType} onChange={(e) => setFilterType(e.target.value)} style={inputStyle}>
+                                <option value="all">All Types</option>
+                                <option value="earn">Earned</option>
+                                <option value="spend">Spent</option>
+                            </select>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                            <label style={labelStyle}>Category</label>
+                            <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} style={inputStyle}>
+                                <option value="all">All Categories</option>
+                                <option value="swap">Swaps</option>
+                                <option value="bonus">Bonuses</option>
+                                <option value="referral">Referrals</option>
+                                <option value="purchase">Purchases</option>
+                                <option value="promotion">Promotions</option>
+                            </select>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                            <label style={labelStyle}>Date From</label>
+                            <input
+                                type="date"
+                                value={dateFrom ? dateFrom.toISOString().split('T')[0] : ''}
+                                onChange={(e) => setDateFrom(e.target.value ? new Date(e.target.value) : null)}
+                                style={inputStyle}
+                            />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                            <label style={labelStyle}>Date To</label>
+                            <input
+                                type="date"
+                                value={dateTo ? dateTo.toISOString().split('T')[0] : ''}
+                                onChange={(e) => setDateTo(e.target.value ? new Date(e.target.value) : null)}
+                                style={inputStyle}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Transactions Table */}
+                <div style={dashboardCardStyle}>
+                    <div style={{ ...cardHeaderStyle, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div>
+                            <h3 style={cardTitleStyle}>Transaction History</h3>
+                            <p style={cardDescriptionStyle}>
+                                {filteredTransactions.length} transactions found
+                            </p>
+                        </div>
+                        <button style={{ ...outlineButtonStyle, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Download style={{ height: '1rem', width: '1rem' }} />
+                            Export
+                        </button>
+                    </div>
+                    <div style={{ overflowX: 'auto', padding: '1rem' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid #E2E8F0' }}>
+                                    <th style={{ textAlign: 'left', padding: '0.75rem 0.5rem', color: '#718096', fontSize: '0.75rem' }}>Date</th>
+                                    <th style={{ textAlign: 'left', padding: '0.75rem 0.5rem', color: '#718096', fontSize: '0.75rem' }}>Transaction</th>
+                                    <th style={{ textAlign: 'left', padding: '0.75rem 0.5rem', color: '#718096', fontSize: '0.75rem' }}>Category</th>
+                                    <th style={{ textAlign: 'left', padding: '0.75rem 0.5rem', color: '#718096', fontSize: '0.75rem' }}>Item/Description</th>
+                                    <th style={{ textAlign: 'left', padding: '0.75rem 0.5rem', color: '#718096', fontSize: '0.75rem' }}>Amount</th>
+                                    <th style={{ textAlign: 'left', padding: '0.75rem 0.5rem', color: '#718096', fontSize: '0.75rem' }}>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {paginatedTransactions.map((transaction) => (
+                                    <tr key={transaction.id} style={{ borderBottom: '1px solid #E2E8F0' }}>
+                                        <td style={{ padding: '0.75rem 0.5rem', fontSize: '0.875rem', color: '#4A5568' }}>
+                                            {new Date(transaction.date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
+                                        </td>
+                                        <td style={{ padding: '0.75rem 0.5rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                {getTransactionIcon(transaction.category, transaction.type)}
+                                                <div>
+                                                    <p style={{ fontWeight: '500', fontSize: '0.875rem' }}>{transaction.reason}</p>
+                                                    <p style={{ fontSize: '0.75rem', color: '#718096' }}>{transaction.description}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '0.75rem 0.5rem' }}>
+                                            <span style={{ ...badgeStyle, backgroundColor: '#E2E8F0', color: '#4A5568', padding: '0.2rem 0.5rem', borderRadius: '0.25rem' }}>
+                                                {transaction.category.charAt(0).toUpperCase() + transaction.category.slice(1)}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '0.75rem 0.5rem', fontSize: '0.875rem', color: '#4A5568' }}>
+                                            {transaction.itemName || '-'}
+                                        </td>
+                                        <td style={{ padding: '0.75rem 0.5rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: '600', color: transaction.type === 'earn' ? '#48BB78' : '#F6AD55' }}>
+                                                {transaction.type === 'earn' ? <Plus style={{ height: '0.75rem', width: '0.75rem' }} /> : <Minus style={{ height: '0.75rem', width: '0.75rem' }} />}
+                                                {transaction.amount.toLocaleString()}
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '0.75rem 0.5rem' }}>
+                                            {getStatusBadge(transaction.status)}
+                                        </td>
+                                    </tr>
+                                ))}
+                                {paginatedTransactions.length === 0 && (
+                                    <tr>
+                                        <td colSpan="6" style={{ textAlign: 'center', padding: '2rem', color: '#718096' }}>No transactions found for the selected filters.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '1rem', padding: '1rem' }}>
+                            <p style={{ fontSize: '0.875rem', color: '#718096' }}>
+                                Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredTransactions.length)} of {filteredTransactions.length} transactions
+                            </p>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button
+                                    style={outlineButtonStyle}
+                                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                    disabled={currentPage === 1}
+                                >
+                                    Previous
+                                </button>
+                                <button
+                                    style={outlineButtonStyle}
+                                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// New RatingsPage Component
+const RatingsPage = () => {
+    const [selectedRating, setSelectedRating] = useState(0);
+    const [comment, setComment] = useState('');
+    const [activeTab, setActiveTab] = useState('pending');
+    const [message, setMessage] = useState(''); // For MessageBox
+
+    // Mock data - in real app, this would come from your backend/Supabase
+    const [pendingRatings] = useState([
+        {
+            id: '1',
+            swapId: 'swap_001',
+            partnerName: 'Sarah Johnson',
+            partnerAvatar: 'https://placehold.co/150x150/A78BFA/FFFFFF?text=SJ',
+            itemSwapped: 'Vintage Denim Jacket',
+            completedDate: '2024-01-10'
+        },
+        {
+            id: '2',
+            swapId: 'swap_002',
+            partnerName: 'Mike Chen',
+            partnerAvatar: 'https://placehold.co/150x150/A78BFA/FFFFFF?text=MC',
+            itemSwapped: 'Designer Sneakers',
+            completedDate: '2024-01-08'
+        }
+    ]);
+
+    const [ratingsHistory] = useState([
+        {
+            id: '1',
+            userId: 'user_001',
+            userName: 'Emma Davis',
+            userAvatar: 'https://placehold.co/150x150/A78BFA/FFFFFF?text=ED',
+            rating: 5,
+            comment: 'Amazing swap! Item was exactly as described and shipped quickly.',
+            swapId: 'swap_003',
+            itemName: 'Cashmere Sweater',
+            date: '2024-01-05',
+            type: 'received'
+        },
+        {
+            id: '2',
+            userId: 'user_002',
+            userName: 'Alex Wilson',
+            userAvatar: 'https://placehold.co/150x150/A78BFA/FFFFFF?text=AW',
+            rating: 4,
+            comment: 'Great communication and item condition. Would swap again!',
+            swapId: 'swap_004',
+            itemName: 'Leather Boots',
+            date: '2024-01-03',
+            type: 'given'
+        }
+    ]);
+
+    const handleSubmitRating = (pendingId) => {
+        if (selectedRating === 0) {
+            setMessage("Please select a star rating before submitting.");
+            return;
+        }
+
+        // Here you would make API call to submit rating
+        setMessage("Rating Submitted! Thank you for your feedback! This helps build trust in our community.");
+
+        setSelectedRating(0);
+        setComment('');
+        // In a real app, you'd remove the submitted rating from pendingRatings state
+    };
+
+    const renderStars = (rating, interactive = false, size = 'md') => {
+        const sizeStyle = {
+            sm: { height: '1rem', width: '1rem' },
+            md: { height: '1.25rem', width: '1.25rem' },
+            lg: { height: '1.5rem', width: '1.5rem' }
+        };
+
+        return (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                        key={star}
+                        style={{
+                            ...sizeStyle[size],
+                            fill: star <= rating ? '#F6E05E' : 'none',
+                            color: star <= rating ? '#F6E05E' : '#A0AEC0',
+                            cursor: interactive ? 'pointer' : 'default',
+                            transition: 'color 0.15s ease-in-out, fill 0.15s ease-in-out',
+                        }}
+                        onClick={interactive ? () => setSelectedRating(star) : undefined}
+                    />
+                ))}
+            </div>
+        );
+    };
+
+    return (
+        <div style={{ padding: '1.5rem', backgroundColor: '#F7FAFC', borderRadius: '0.75rem' }}>
+            <div style={{ maxWidth: '64rem', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                {/* Header */}
+                <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                    <h1 style={{ fontSize: '2.25rem', fontWeight: 'bold', color: '#2D3748' }}>
+                        Ratings & Reviews
+                    </h1>
+                    <p style={{ color: '#718096' }}>
+                        Rate your swap experiences and view your feedback history
+                    </p>
+                </div>
+
+                {/* Tab Navigation */}
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ backgroundColor: '#FFFFFF', borderRadius: '0.5rem', padding: '0.25rem', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)' }}>
+                        <div style={{ display: 'flex' }}>
+                            <button
+                                style={{ ...navButtonStyle, ... (activeTab === 'pending' ? primaryNavButtonStyle : {}), display: 'flex', alignItems: 'center' }}
+                                onClick={() => setActiveTab('pending')}
+                            >
+                                <Clock style={{ height: '1rem', width: '1rem', marginRight: '0.5rem' }} />
+                                Pending Ratings
+                                {pendingRatings.length > 0 && (
+                                    <span style={{ marginLeft: '0.5rem', height: '1.25rem', width: '1.25rem', borderRadius: '9999px', padding: '0.125rem', fontSize: '0.75rem', backgroundColor: '#3182CE', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {pendingRatings.length}
+                                    </span>
+                                )}
+                            </button>
+                            <button
+                                style={{ ...navButtonStyle, ... (activeTab === 'history' ? primaryNavButtonStyle : {}), display: 'flex', alignItems: 'center' }}
+                                onClick={() => setActiveTab('history')}
+                            >
+                                <UserCheck style={{ height: '1rem', width: '1rem', marginRight: '0.5rem' }} />
+                                Rating History
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Pending Ratings */}
+                {activeTab === 'pending' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {pendingRatings.length === 0 ? (
+                            <div style={emptyStateCardStyle}>
+                                <CheckCircle style={{ height: '3rem', width: '3rem', color: '#48BB78', margin: '0 auto 1rem' }} />
+                                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem' }}>All caught up!</h3>
+                                <p style={{ color: '#718096' }}>No pending ratings at the moment.</p>
+                            </div>
+                        ) : (
+                            pendingRatings.map((pending) => (
+                                <div key={pending.id} style={dashboardCardStyle}>
+                                    <div style={{ padding: '1.5rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                            <img src={pending.partnerAvatar} alt={pending.partnerName} style={{ height: '3rem', width: '3rem', borderRadius: '9999px', objectFit: 'cover' }} />
+                                            <div style={{ flex: 1 }}>
+                                                <h4 style={{ fontSize: '1.125rem', fontWeight: '600' }}>{pending.partnerName}</h4>
+                                                <p style={{ fontSize: '0.875rem', color: '#718096' }}>
+                                                    Swapped: {pending.itemSwapped} • Completed: {new Date(pending.completedDate).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={labelStyle}>Rate your experience</label>
+                                            {renderStars(selectedRating, true, 'lg')}
+                                        </div>
+                                        
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={labelStyle}>Comments (optional)</label>
+                                            <textarea
+                                                placeholder="Share your experience with this swap partner..."
+                                                value={comment}
+                                                onChange={(e) => setComment(e.target.value)}
+                                                style={{ ...inputStyle, minHeight: '5rem' }}
+                                            ></textarea>
+                                        </div>
+                                        
+                                        <button 
+                                            onClick={() => handleSubmitRating(pending.id)}
+                                            style={{ ...primaryButtonStyle, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                        >
+                                            <Send style={{ height: '1rem', width: '1rem', marginRight: '0.5rem' }} />
+                                            Submit Rating
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                )}
+
+                {/* Rating History */}
+                {activeTab === 'history' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {ratingsHistory.length === 0 ? (
+                            <div style={emptyStateCardStyle}>
+                                <Star style={{ height: '3rem', width: '3rem', color: '#A0AEC0', margin: '0 auto 1rem' }} />
+                                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem' }}>No ratings yet</h3>
+                                <p style={{ color: '#718096' }}>Complete some swaps to see your rating history here.</p>
+                            </div>
+                        ) : (
+                            ratingsHistory.map((rating) => (
+                                <div key={rating.id} style={dashboardCardStyle}>
+                                    <div style={{ padding: '1.5rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+                                            <img src={rating.userAvatar} alt={rating.userName} style={{ height: '2.5rem', width: '2.5rem', borderRadius: '9999px', objectFit: 'cover' }} />
+                                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <div>
+                                                        <h4 style={{ fontWeight: '600' }}>{rating.userName}</h4>
+                                                        <p style={{ fontSize: '0.75rem', color: '#718096' }}>
+                                                            {rating.itemName} • {new Date(rating.date).toLocaleDateString()}
+                                                        </p>
+                                                    </div>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                        <span style={{ ...badgeStyle, backgroundColor: rating.type === 'received' ? '#3182CE' : '#A0AEC0', color: '#FFFFFF', padding: '0.2rem 0.5rem', borderRadius: '0.25rem' }}>
+                                                            {rating.type === 'received' ? 'Received' : 'Given'}
+                                                        </span>
+                                                        {renderStars(rating.rating, false, 'sm')}
+                                                    </div>
+                                                </div>
+                                                {rating.comment && (
+                                                    <p style={{ fontSize: '0.875rem', color: '#4A5568', backgroundColor: '#F0F4F8', padding: '0.75rem', borderRadius: '0.375rem' }}>
+                                                        "{rating.comment}"
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                )}
+            </div>
+            <MessageBox message={message} onClose={() => setMessage('')} />
+        </div>
+    );
+};
+
+const AdminPanel = ({ onNavigate }) => {
+    const { token, user } = useAuth();
+    const [tab, setTab] = useState('pending'); // 'pending' or 'all'
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [message, setMessage] = useState('');
+    const [search, setSearch] = useState('');
+    const [modalItem, setModalItem] = useState(null);
+    const [actionLoading, setActionLoading] = useState(null); // Track which action is loading
+    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [selectedStatus, setSelectedStatus] = useState('all');
+    const [sortBy, setSortBy] = useState('createdAt');
+    const [sortOrder, setSortOrder] = useState('desc');
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [bulkAction, setBulkAction] = useState('');
+
+    const fetchItems = async () => {
+        setLoading(true);
+        setMessage('');
+        let url = tab === 'pending'
+            ? 'http://localhost:5000/api/admin/items/pending'
+            : 'http://localhost:5000/api/admin/items/all';
+        try {
+            const response = await fetch(url, {
+                headers: { 'x-auth-token': token }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setItems(data);
+            } else {
+                setMessage(data.msg || 'Failed to fetch items');
+            }
+        } catch (error) {
+            setMessage('Network error fetching items');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchItems();
+        // eslint-disable-next-line
+    }, [tab]);
+
+    const handleAction = async (itemId, action) => {
+        setActionLoading(itemId + action);
+        setMessage('');
+        let url = '';
+        let method = 'PUT';
+        if (action === 'approve') {
+            url = `http://localhost:5000/api/admin/items/${itemId}/approve`;
+        } else if (action === 'reject') {
+            url = `http://localhost:5000/api/admin/items/${itemId}/reject`;
+        } else if (action === 'delete') {
+            url = `http://localhost:5000/api/admin/items/${itemId}`;
+            method = 'DELETE';
+        }
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: { 'x-auth-token': token }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setMessage(`Item ${action}d successfully!`);
+                fetchItems();
+                setSelectedItems(prev => prev.filter(id => id !== itemId));
+            } else {
+                setMessage(data.msg || `Failed to ${action} item`);
+            }
+        } catch (error) {
+            setMessage(`Network error during ${action}`);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
+    const handleBulkAction = async () => {
+        if (!bulkAction || selectedItems.length === 0) return;
+        
+        setActionLoading('bulk');
+        setMessage('');
+        
+        try {
+            const promises = selectedItems.map(itemId => {
+                let url = '';
+                let method = 'PUT';
+                if (bulkAction === 'approve') {
+                    url = `http://localhost:5000/api/admin/items/${itemId}/approve`;
+                } else if (bulkAction === 'reject') {
+                    url = `http://localhost:5000/api/admin/items/${itemId}/reject`;
+                } else if (bulkAction === 'delete') {
+                    url = `http://localhost:5000/api/admin/items/${itemId}`;
+                    method = 'DELETE';
+                }
+                
+                return fetch(url, {
+                    method,
+                    headers: { 'x-auth-token': token }
+                });
+            });
+            
+            const responses = await Promise.all(promises);
+            const failedCount = responses.filter(r => !r.ok).length;
+            const successCount = responses.length - failedCount;
+            
+            if (successCount > 0) {
+                setMessage(`Successfully ${bulkAction}d ${successCount} items${failedCount > 0 ? `, ${failedCount} failed` : ''}`);
+                fetchItems();
+                setSelectedItems([]);
+                setBulkAction('');
+            } else {
+                setMessage(`Failed to ${bulkAction} items`);
+            }
+        } catch (error) {
+            setMessage(`Network error during bulk ${bulkAction}`);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedItems.length === filteredItems.length) {
+            setSelectedItems([]);
+        } else {
+            setSelectedItems(filteredItems.map(item => item._id));
+        }
+    };
+
+    const toggleSelectItem = (itemId) => {
+        setSelectedItems(prev => 
+            prev.includes(itemId) 
+                ? prev.filter(id => id !== itemId)
+                : [...prev, itemId]
+        );
+    };
+
+    // Filter and sort items
+    const filteredItems = items
+        .filter(item => {
+            const searchLower = search.toLowerCase();
+            const uploaderEmail = item.uploaderEmail || (item.uploader && item.uploader.email) || '';
+            const matchesSearch = (
+                item.title.toLowerCase().includes(searchLower) ||
+                uploaderEmail.toLowerCase().includes(searchLower)
+            );
+            const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+            const matchesStatus = selectedStatus === 'all' || item.status === selectedStatus;
+            return matchesSearch && matchesCategory && matchesStatus;
+        })
+        .sort((a, b) => {
+            let aValue = a[sortBy];
+            let bValue = b[sortBy];
+            
+            if (sortBy === 'createdAt') {
+                aValue = new Date(aValue);
+                bValue = new Date(bValue);
+            }
+            
+            if (sortOrder === 'asc') {
+                return aValue > bValue ? 1 : -1;
+            } else {
+                return aValue < bValue ? 1 : -1;
+            }
+        });
+
+    // Get unique categories for filter
+    const categories = ['all', ...new Set(items.map(item => item.category))];
+    const statuses = ['all', 'pending', 'approved', 'rejected'];
+
+    // Get status badge style
+    const getStatusBadge = (status) => {
+        const baseStyle = {
+            padding: '0.25rem 0.5rem',
+            borderRadius: '0.25rem',
+            fontSize: '0.75rem',
+            fontWeight: '500',
+            textTransform: 'uppercase'
+        };
+        
+        switch (status) {
+            case 'pending':
+                return { ...baseStyle, backgroundColor: '#FEF3C7', color: '#92400E' };
+            case 'approved':
+                return { ...baseStyle, backgroundColor: '#D1FAE5', color: '#065F46' };
+            case 'rejected':
+                return { ...baseStyle, backgroundColor: '#FEE2E2', color: '#991B1B' };
+            default:
+                return { ...baseStyle, backgroundColor: '#E5E7EB', color: '#374151' };
+        }
+    };
+
+    // Modal for item details
+    const ItemModal = ({ item, onClose }) => (
+        <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+        }}>
+            <div style={{ 
+                background: '#fff', 
+                borderRadius: '0.5rem', 
+                padding: '2rem', 
+                maxWidth: '40rem', 
+                width: '90%', 
+                maxHeight: '90vh',
+                overflow: 'auto',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.2)' 
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{item.title}</h2>
+                    <button 
+                        onClick={onClose}
+                        style={{ 
+                            background: 'none', 
+                            border: 'none', 
+                            fontSize: '1.5rem', 
+                            cursor: 'pointer',
+                            color: '#6B7280'
+                        }}
+                    >
+                        ×
+                    </button>
+                </div>
+                
+                <img 
+                    src={item.imageUrl} 
+                    alt={item.title} 
+                    style={{ 
+                        width: '100%', 
+                        maxHeight: '300px', 
+                        objectFit: 'cover', 
+                        borderRadius: '0.5rem', 
+                        marginBottom: '1rem' 
+                    }} 
+                />
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                    <div>
+                        <p><b>Description:</b></p>
+                        <p style={{ color: '#4B5563', marginTop: '0.25rem' }}>{item.description}</p>
+                    </div>
+                    <div>
+                        <p><b>Category:</b> {item.category}</p>
+                        <p><b>Type:</b> {item.type}</p>
+                        <p><b>Size:</b> {item.size}</p>
+                        <p><b>Condition:</b> {item.condition}</p>
+                        <p><b>Points:</b> {item.points}</p>
+                        <p><b>Status:</b> <span style={getStatusBadge(item.status)}>{item.status}</span></p>
+                        <p><b>Uploader:</b> {item.uploaderEmail || (item.uploader && item.uploader.email)}</p>
+                        <p><b>Listed:</b> {new Date(item.createdAt).toLocaleDateString()}</p>
+                    </div>
+                </div>
+                
+                {item.tags && item.tags.length > 0 && (
+                    <div style={{ marginBottom: '1rem' }}>
+                        <p><b>Tags:</b></p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.25rem' }}>
+                            {item.tags.map((tag, index) => (
+                                <span key={index} style={{ 
+                                    backgroundColor: '#E5E7EB', 
+                                    padding: '0.25rem 0.5rem', 
+                                    borderRadius: '0.25rem', 
+                                    fontSize: '0.75rem' 
+                                }}>
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                    <button style={{ ...outlineButtonStyle, width: 'auto' }} onClick={onClose}>
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+
+    // Add or update styles for the admin panel filter section
+    const adminPanelFilterStyle = {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '1rem',
+        marginBottom: '1.5rem',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#F9FAFB',
+        padding: '1rem',
+        borderRadius: '0.5rem',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
+    };
+
+    return (
+        <div style={pageContainerStyle}>
+            <div style={formCardStyle}>
+                {/* Header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <div>
+                        <h2 style={formTitleStyle}>Admin Panel</h2>
+                        <p style={{ color: '#6B7280', marginTop: '0.5rem' }}>
+                            Welcome, {user?.email || 'Admin'}! Moderate and manage item listings below.
+                        </p>
+                    </div>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        <button
+                            style={{ ...outlineButtonStyle, width: 'auto' }}
+                            onClick={() => onNavigate('dashboard')}
+                        >
+                            ← Back to Dashboard
+                        </button>
+                        <button
+                            style={{ ...logoutButtonStyle, width: 'auto' }}
+                            onClick={() => {
+                                // Clear auth state and redirect to login
+                                if (typeof window !== 'undefined') {
+                                    localStorage.removeItem('token');
+                                }
+                                if (typeof window !== 'undefined') {
+                                    window.location.reload();
+                                }
+                            }}
+                        >
+                            Logout
+                        </button>
+                    </div>
+                </div>
+
+                {/* Stats */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+                    <div style={{ backgroundColor: '#FEF3C7', padding: '1rem', borderRadius: '0.5rem', textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#92400E' }}>
+                            {items.filter(item => item.status === 'pending').length}
+                        </div>
+                        <div style={{ fontSize: '0.875rem', color: '#92400E' }}>Pending Review</div>
+                    </div>
+                    <div style={{ backgroundColor: '#D1FAE5', padding: '1rem', borderRadius: '0.5rem', textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#065F46' }}>
+                            {items.filter(item => item.status === 'approved').length}
+                        </div>
+                        <div style={{ fontSize: '0.875rem', color: '#065F46' }}>Approved</div>
+                    </div>
+                    <div style={{ backgroundColor: '#FEE2E2', padding: '1rem', borderRadius: '0.5rem', textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#991B1B' }}>
+                            {items.filter(item => item.status === 'rejected').length}
+                        </div>
+                        <div style={{ fontSize: '0.875rem', color: '#991B1B' }}>Rejected</div>
+                    </div>
+                    <div style={{ backgroundColor: '#E5E7EB', padding: '1rem', borderRadius: '0.5rem', textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#374151' }}>
+                            {items.length}
+                        </div>
+                        <div style={{ fontSize: '0.875rem', color: '#374151' }}>Total Items</div>
+                    </div>
+                </div>
+
+                {/* Controls */}
+                <div style={adminPanelFilterStyle}>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                            style={{ 
+                                ...primaryButtonStyle, 
+                                width: 'auto', 
+                                backgroundColor: tab === 'pending' ? '#3182CE' : '#F3F4F6', 
+                                color: tab === 'pending' ? '#fff' : '#374151',
+                                border: tab === 'pending' ? 'none' : '1px solid #D1D5DB'
+                            }}
+                            onClick={() => setTab('pending')}
+                        >
+                            Pending Items ({items.filter(item => item.status === 'pending').length})
+                        </button>
+                        <button
+                            style={{ 
+                                ...primaryButtonStyle, 
+                                width: 'auto', 
+                                backgroundColor: tab === 'all' ? '#3182CE' : '#F3F4F6', 
+                                color: tab === 'all' ? '#fff' : '#374151',
+                                border: tab === 'all' ? 'none' : '1px solid #D1D5DB'
+                            }}
+                            onClick={() => setTab('all')}
+                        >
+                            All Items ({items.length})
+                        </button>
+                    </div>
+                    
+                    {/* Filters */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                            <select
+                                value={selectedCategory}
+                                onChange={(e) => setSelectedCategory(e.target.value)}
+                                style={{ ...inputStyle, width: '150px' }}
+                            >
+                                {categories.map(cat => (
+                                    <option key={cat} value={cat}>
+                                        {cat === 'all' ? 'All Categories' : cat}
+                                    </option>
+                                ))}
+                            </select>
+                            
+                            <select
+                                value={selectedStatus}
+                                onChange={(e) => setSelectedStatus(e.target.value)}
+                                style={{ ...inputStyle, width: '150px' }}
+                            >
+                                {statuses.map(status => (
+                                    <option key={status} value={status}>
+                                        {status === 'all' ? 'All Status' : status.charAt(0).toUpperCase() + status.slice(1)}
+                                    </option>
+                                ))}
+                            </select>
+                            
+                            <select
+                                value={`${sortBy}-${sortOrder}`}
+                                onChange={(e) => {
+                                    const [field, order] = e.target.value.split('-');
+                                    setSortBy(field);
+                                    setSortOrder(order);
+                                }}
+                                style={{ ...inputStyle, width: '150px' }}
+                            >
+                                <option value="createdAt-desc">Newest First</option>
+                                <option value="createdAt-asc">Oldest First</option>
+                                <option value="title-asc">Title A-Z</option>
+                                <option value="title-desc">Title Z-A</option>
+                                <option value="points-desc">Points High-Low</option>
+                                <option value="points-asc">Points Low-High</option>
+                            </select>
+                            
+                            <input
+                                type="text"
+                                placeholder="Search by title or uploader..."
+                                value={search}
+                                onChange={e => setSearch(e.target.value)}
+                                style={{ ...inputStyle, width: '200px' }}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Loading and Messages */}
+                {loading && (
+                    <div style={{ textAlign: 'center', padding: '2rem' }}>
+                        <div style={spinnerStyle}></div>
+                        <p style={{ marginTop: '1rem', color: '#6B7280' }}>Loading items...</p>
+                    </div>
+                )}
+                
+                {message && (
+                    <div style={{ 
+                        padding: '1rem', 
+                        borderRadius: '0.5rem', 
+                        marginBottom: '1rem',
+                        backgroundColor: message.includes('successfully') ? '#D1FAE5' : '#FEE2E2',
+                        color: message.includes('successfully') ? '#065F46' : '#991B1B',
+                        border: `1px solid ${message.includes('successfully') ? '#A7F3D0' : '#FCA5A5'}`
+                    }}>
+                        {message}
+                    </div>
+                )}
+
+                {/* Empty State */}
+                {!loading && filteredItems.length === 0 && (
+                    <div style={{ textAlign: 'center', padding: '3rem', color: '#6B7280' }}>
+                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📦</div>
+                        <h3 style={{ marginBottom: '0.5rem' }}>No items found</h3>
+                        <p>
+                            {tab === 'pending' 
+                                ? 'No pending items to review.' 
+                                : search || selectedCategory !== 'all' || selectedStatus !== 'all'
+                                    ? 'No items match your current filters. Try adjusting your search or filters.'
+                                    : 'No items in the system.'
+                            }
+                        </p>
+                        {(search || selectedCategory !== 'all' || selectedStatus !== 'all') && (
+                            <button
+                                onClick={() => {
+                                    setSearch('');
+                                    setSelectedCategory('all');
+                                    setSelectedStatus('all');
+                                }}
+                                style={{ ...outlineButtonStyle, width: 'auto', marginTop: '1rem' }}
+                            >
+                                Clear All Filters
+                            </button>
+                        )}
+                    </div>
+                )}
+
+                {/* Bulk Actions */}
+                {selectedItems.length > 0 && (
+                    <div style={{ 
+                        backgroundColor: '#F0F9FF', 
+                        padding: '1rem', 
+                        borderRadius: '0.5rem', 
+                        marginBottom: '1rem',
+                        border: '1px solid #BAE6FD'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                            <span style={{ fontWeight: '500', color: '#0369A1' }}>
+                                {selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''} selected
+                            </span>
+                            <select
+                                value={bulkAction}
+                                onChange={(e) => setBulkAction(e.target.value)}
+                                style={{ ...inputStyle, width: '150px' }}
+                            >
+                                <option value="">Choose action...</option>
+                                <option value="approve">Approve All</option>
+                                <option value="reject">Reject All</option>
+                                <option value="delete">Delete All</option>
+                            </select>
+                            <button
+                                onClick={handleBulkAction}
+                                disabled={!bulkAction || actionLoading === 'bulk'}
+                                style={{ 
+                                    ...primaryButtonStyle, 
+                                    width: 'auto',
+                                    opacity: (!bulkAction || actionLoading === 'bulk') ? 0.6 : 1
+                                }}
+                            >
+                                {actionLoading === 'bulk' ? 'Processing...' : 'Apply'}
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setSelectedItems([]);
+                                    setBulkAction('');
+                                }}
+                                style={{ ...outlineButtonStyle, width: 'auto' }}
+                            >
+                                Clear Selection
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Items Table */}
+                {!loading && filteredItems.length > 0 && (
+                    <div style={{ overflow: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '2px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600', width: '40px' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedItems.length === filteredItems.length && filteredItems.length > 0}
+                                            onChange={toggleSelectAll}
+                                            style={{ width: '16px', height: '16px' }}
+                                        />
+                                    </th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Item</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Uploader</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Category</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Points</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Status</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Date</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem 0.5rem', fontWeight: '600' }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredItems.map(item => (
+                                    <tr key={item._id} style={{ borderBottom: '1px solid #E5E7EB', '&:hover': { backgroundColor: '#F9FAFB' } }}>
+                                        <td style={{ padding: '1rem 0.5rem' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedItems.includes(item._id)}
+                                                onChange={() => toggleSelectItem(item._id)}
+                                                style={{ width: '16px', height: '16px' }}
+                                            />
+                                        </td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                <img 
+                                                    src={item.imageUrl} 
+                                                    alt={item.title}
+                                                    style={{ 
+                                                        width: '40px', 
+                                                        height: '40px', 
+                                                        objectFit: 'cover', 
+                                                        borderRadius: '0.25rem' 
+                                                    }}
+                                                />
+                                                <div>
+                                                    <div style={{ fontWeight: '500' }}>{item.title}</div>
+                                                    <div style={{ fontSize: '0.875rem', color: '#6B7280' }}>{item.type}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>{item.uploaderEmail || (item.uploader && item.uploader.email)}</td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>{item.category}</td>
+                                        <td style={{ padding: '1rem 0.5rem', fontWeight: '500' }}>{item.points}</td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>
+                                            <span style={getStatusBadge(item.status)}>{item.status}</span>
+                                        </td>
+                                        <td style={{ padding: '1rem 0.5rem', fontSize: '0.875rem', color: '#6B7280' }}>
+                                            {new Date(item.createdAt).toLocaleDateString()}
+                                        </td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>
+                                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                <button 
+                                                    style={{ ...outlineButtonStyle, width: 'auto', padding: '0.25rem 0.75rem', fontSize: '0.875rem' }} 
+                                                    onClick={() => setModalItem(item)}
+                                                >
+                                                    View
+                                                </button>
+                                                {tab === 'pending' && (
+                                                    <>
+                                                        <button 
+                                                            style={{ 
+                                                                ...primaryButtonStyle, 
+                                                                width: 'auto', 
+                                                                padding: '0.25rem 0.75rem', 
+                                                                fontSize: '0.875rem',
+                                                                opacity: actionLoading === item._id + 'approve' ? 0.6 : 1
+                                                            }} 
+                                                            onClick={() => handleAction(item._id, 'approve')}
+                                                            disabled={actionLoading === item._id + 'approve'}
+                                                        >
+                                                            {actionLoading === item._id + 'approve' ? '...' : 'Approve'}
+                                                        </button>
+                                                        <button 
+                                                            style={{ 
+                                                                ...secondaryButtonStyle, 
+                                                                width: 'auto', 
+                                                                padding: '0.25rem 0.75rem', 
+                                                                fontSize: '0.875rem',
+                                                                opacity: actionLoading === item._id + 'reject' ? 0.6 : 1
+                                                            }} 
+                                                            onClick={() => handleAction(item._id, 'reject')}
+                                                            disabled={actionLoading === item._id + 'reject'}
+                                                        >
+                                                            {actionLoading === item._id + 'reject' ? '...' : 'Reject'}
+                                                        </button>
+                                                    </>
+                                                )}
+                                                <button 
+                                                    style={{ 
+                                                        ...outlineButtonStyle, 
+                                                        width: 'auto', 
+                                                        padding: '0.25rem 0.75rem', 
+                                                        fontSize: '0.875rem', 
+                                                        color: '#E53E3E', 
+                                                        borderColor: '#E53E3E',
+                                                        opacity: actionLoading === item._id + 'delete' ? 0.6 : 1
+                                                    }} 
+                                                    onClick={() => handleAction(item._id, 'delete')}
+                                                    disabled={actionLoading === item._id + 'delete'}
+                                                >
+                                                    {actionLoading === item._id + 'delete' ? '...' : 'Delete'}
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                {/* Modal */}
+                {modalItem && <ItemModal item={modalItem} onClose={() => setModalItem(null)} />}
+            </div>
+        </div>
+    );
+};
 
 // New component to encapsulate the main app logic
 const AppContent = () => {
@@ -2022,9 +4486,18 @@ const AppContent = () => {
         case 'edit-profile':
             PageComponent = <EditProfilePage onNavigate={handleNavigate} />;
             break;
+        case 'points-history': // New route for points history
+            PageComponent = <PointsHistory />;
+            break;
+        case 'ratings': // New route for ratings
+            PageComponent = <RatingsPage />;
+            break;
         case 'landing':
         default:
             PageComponent = <LandingPage onNavigate={handleNavigate} />;
+            break;
+        case 'admin-panel':
+            PageComponent = <AdminPanel onNavigate={handleNavigate} />;
             break;
     }
 
@@ -2045,941 +4518,3 @@ const App = () => {
 };
 
 export default App;
-
-
-// --- Inline Styles (replacing Tailwind CSS) ---
-// These styles are basic and can be expanded upon with proper CSS files or a different styling solution.
-
-const rootContainerStyle = {
-    fontFamily: 'sans-serif', // Fallback font
-    WebkitFontSmoothing: 'antialiased',
-    MozOsxFontSmoothing: 'grayscale',
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: '#F7FAFC', // Light gray background
-};
-
-const appContainerStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100vh',
-    backgroundColor: '#F7FAFC',
-};
-
-const pageContainerStyle = {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F7FAFC',
-    padding: '1rem',
-};
-
-const formCardStyle = {
-    backgroundColor: '#FFFFFF',
-    padding: '2rem',
-    borderRadius: '0.5rem',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    width: '100%',
-    maxWidth: '28rem',
-};
-
-const formTitleStyle = {
-    fontSize: '1.875rem',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#2D3748',
-    marginBottom: '2rem',
-};
-
-const formStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.5rem',
-};
-
-const labelStyle = {
-    display: 'block',
-    fontSize: '0.875rem',
-    fontWeight: '500',
-    color: '#4A5568',
-    marginBottom: '0.25rem',
-};
-
-const inputStyle = {
-    width: '100%',
-    padding: '0.5rem 1rem',
-    border: '1px solid #CBD5E0',
-    borderRadius: '0.375rem',
-    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-    outline: 'none',
-    transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
-};
-
-const primaryButtonStyle = {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '0.75rem 1rem',
-    border: '1px solid transparent',
-    borderRadius: '0.375rem',
-    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-    fontSize: '1.125rem',
-    fontWeight: '500',
-    color: '#FFFFFF',
-    backgroundColor: '#3182CE', // Blue-600
-    cursor: 'pointer',
-    transition: 'background-color 0.15s ease-in-out',
-};
-
-const secondaryButtonStyle = {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '0.75rem 1rem',
-    border: '1px solid transparent',
-    borderRadius: '0.375rem',
-    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-    fontSize: '1.125rem',
-    fontWeight: '500',
-    color: '#FFFFFF',
-    backgroundColor: '#48BB78', // Green-600
-    cursor: 'pointer',
-    transition: 'background-color 0.15s ease-in-out',
-};
-
-const linkButtonStyle = {
-    fontWeight: '500',
-    color: '#3182CE',
-    background: 'none',
-    border: 'none',
-    padding: '0',
-    cursor: 'pointer',
-    textDecoration: 'underline',
-};
-
-const formTextStyle = {
-    marginTop: '1.5rem',
-    textAlign: 'center',
-    color: '#4A5568',
-};
-
-const messageBoxOverlayStyle = {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '1rem',
-    zIndex: 50,
-};
-
-const messageBoxContentStyle = {
-    backgroundColor: '#FFFFFF',
-    borderRadius: '0.5rem',
-    padding: '1.5rem',
-    boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)',
-    maxWidth: '24rem',
-    width: '100%',
-    textAlign: 'center',
-};
-
-const messageBoxButtonStyle = {
-    padding: '0.5rem 1.5rem',
-    backgroundColor: '#3182CE',
-    color: '#FFFFFF',
-    borderRadius: '0.375rem',
-    cursor: 'pointer',
-    border: 'none',
-    outline: 'none',
-    transition: 'background-color 0.15s ease-in-out',
-};
-
-const headerStyle = {
-    backgroundColor: '#FFFFFF',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    padding: '1rem 1.5rem',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderRadius: '0 0 0.5rem 0.5rem',
-};
-
-const headerTitleStyle = {
-    fontSize: '1.5rem',
-    fontWeight: '800',
-    color: '#3182CE',
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    outline: 'none',
-};
-
-const userIdStyle = {
-    marginLeft: '1rem',
-    fontSize: '0.875rem',
-    color: '#718096',
-    display: 'none', // Hidden on small screens
-};
-
-const userEmailStyle = {
-    fontSize: '0.875rem',
-    color: '#4A5568',
-    marginRight: '1rem',
-    fontWeight: '500',
-};
-
-const navStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1rem',
-};
-
-const navButtonStyle = {
-    color: '#4A5568',
-    background: 'none',
-    border: 'none',
-    padding: '0.5rem 0.75rem',
-    fontWeight: '500',
-    cursor: 'pointer',
-    outline: 'none',
-    transition: 'color 0.15s ease-in-out',
-};
-
-const primaryNavButtonStyle = {
-    padding: '0.5rem 1rem',
-    backgroundColor: '#3182CE',
-    color: '#FFFFFF',
-    borderRadius: '0.375rem',
-    cursor: 'pointer',
-    border: 'none',
-    outline: 'none',
-    transition: 'background-color 0.15s ease-in-out',
-};
-
-const logoutButtonStyle = {
-    padding: '0.5rem 1rem',
-    backgroundColor: '#EF4444', // Red-500
-    color: '#FFFFFF',
-    borderRadius: '0.375rem',
-    cursor: 'pointer',
-    border: 'none',
-    outline: 'none',
-    transition: 'background-color 0.15s ease-in-out',
-};
-
-const footerStyle = {
-    backgroundColor: '#2D3748', // Gray-800
-    color: '#FFFFFF',
-    padding: '1.5rem 0',
-    marginTop: 'auto',
-    borderRadius: '0.5rem 0.5rem 0 0',
-};
-
-const footerContentStyle = {
-    maxWidth: '72rem',
-    margin: '0 auto',
-    padding: '0 1.5rem',
-    textAlign: 'center',
-};
-
-const footerLinksStyle = {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '1rem',
-    marginTop: '0.5rem',
-};
-
-const footerLinkStyle = {
-    color: '#A0AEC0', // Gray-400
-    textDecoration: 'none',
-    transition: 'color 0.15s ease-in-out',
-};
-
-const mainContentStyle = {
-    flexGrow: 1,
-    maxWidth: '72rem',
-    margin: '0 auto',
-    padding: '3rem 1.5rem',
-};
-
-const heroSectionStyle = {
-    position: 'relative',
-    backgroundColor: '#3182CE', // Blue-600 to Purple-600 gradient
-    color: '#FFFFFF',
-    padding: '5rem 1.5rem',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    borderRadius: '0 0 0.75rem 0.75rem',
-    boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)',
-};
-
-const heroOverlayStyle = {
-    position: 'absolute',
-    inset: 0,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    opacity: 0.2,
-};
-
-const heroContentStyle = {
-    position: 'relative',
-    zIndex: 10,
-};
-
-const heroTitleStyle = {
-    fontSize: '2.25rem', // md:text-6xl
-    fontWeight: '800',
-    lineHeight: '1.25',
-    marginBottom: '1.5rem',
-    textShadow: '0 2px 4px rgba(0, 0, 0, 0.25)',
-};
-
-const heroSubtitleStyle = {
-    fontSize: '1.125rem', // md:text-xl
-    marginBottom: '2.5rem',
-    maxWidth: '42rem',
-    margin: '0 auto 2.5rem',
-    opacity: 0.9,
-};
-
-const heroButtonsContainerStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-    justifyContent: 'center',
-};
-
-const heroPrimaryButtonStyle = {
-    padding: '1rem 2rem',
-    backgroundColor: '#FFFFFF',
-    color: '#3182CE', // Blue-700
-    borderRadius: '9999px', // Full rounded
-    fontWeight: 'bold',
-    fontSize: '1.125rem',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    cursor: 'pointer',
-    outline: 'none',
-    transition: 'transform 0.3s ease-in-out, background-color 0.3s ease-in-out',
-};
-
-const heroSecondaryButtonStyle = {
-    padding: '1rem 2rem',
-    border: '2px solid #FFFFFF',
-    color: '#FFFFFF',
-    borderRadius: '9999px',
-    fontWeight: 'bold',
-    fontSize: '1.125rem',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    cursor: 'pointer',
-    outline: 'none',
-    transition: 'transform 0.3s ease-in-out, background-color 0.3s ease-in-out, color 0.3s ease-in-out',
-};
-
-const sectionStyle = {
-    maxWidth: '72rem',
-    margin: '0 auto',
-    padding: '4rem 1.5rem',
-};
-
-const altSectionStyle = {
-    backgroundColor: '#F7FAFC', // Gray-100
-    padding: '4rem 1.5rem',
-    borderRadius: '0.75rem',
-    boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.06)',
-};
-
-const sectionTitleStyle = {
-    fontSize: '2.25rem',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#2D3748',
-    marginBottom: '3rem',
-};
-
-const gridContainerStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-    gap: '2rem',
-};
-
-const cardStyle = {
-    backgroundColor: '#FFFFFF',
-    borderRadius: '0.75rem',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    overflow: 'hidden',
-    cursor: 'pointer',
-    transition: 'transform 0.3s ease-in-out',
-};
-
-const cardImageStyle = {
-    width: '100%',
-    height: '12rem', // h-48
-    objectFit: 'cover',
-};
-
-const cardContentStyle = {
-    padding: '1rem',
-};
-
-const cardTitleStyle = {
-    fontWeight: '600',
-    fontSize: '1.25rem',
-    color: '#2D3748',
-    marginBottom: '0.5rem',
-};
-
-const cardDescriptionStyle = {
-    color: '#4A5568',
-    fontSize: '0.875rem',
-};
-
-const cardFooterStyle = {
-    marginTop: '1rem',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-};
-
-const cardPointsStyle = {
-    color: '#3182CE', // Blue-600
-    fontWeight: 'bold',
-};
-
-const cardButtonStyle = {
-    padding: '0.5rem 1rem',
-    backgroundColor: '#3182CE', // Blue-500
-    color: '#FFFFFF',
-    borderRadius: '0.375rem',
-    fontSize: '0.875rem',
-    cursor: 'pointer',
-    border: 'none',
-    outline: 'none',
-    transition: 'background-color 0.15s ease-in-out',
-};
-
-const categoryGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-    gap: '1.5rem',
-};
-
-const categoryCardStyle = {
-    backgroundColor: '#FFFFFF',
-    borderRadius: '0.5rem',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-    padding: '1.5rem',
-    textAlign: 'center',
-    cursor: 'pointer',
-    transition: 'transform 0.3s ease-in-out',
-};
-
-const categoryImageStyle = {
-    margin: '0 auto 1rem',
-    borderRadius: '9999px', // Full rounded
-    width: '6.25rem', // 100px
-    height: '6.25rem', // 100px
-};
-
-const categoryTitleStyle = {
-    fontWeight: '600',
-    fontSize: '1.125rem',
-    color: '#2D3748',
-};
-
-const howItWorksGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '2.5rem',
-};
-
-const howItWorksCardStyle = {
-    padding: '1.5rem',
-    backgroundColor: '#FFFFFF',
-    borderRadius: '0.5rem',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-};
-
-const howItWorksIconStyle = {
-    fontSize: '3.125rem',
-    marginBottom: '1rem',
-    color: '#3182CE', // Example color
-};
-
-const howItWorksTitleStyle = {
-    fontWeight: '600',
-    fontSize: '1.25rem',
-    color: '#2D3748',
-    marginBottom: '0.5rem',
-};
-
-const howItWorksDescriptionStyle = {
-    color: '#4A5568',
-};
-
-const spinnerStyle = {
-    border: '4px solid rgba(0, 0, 0, 0.1)',
-    borderTop: '4px solid #3182CE', // Blue-500
-    borderRadius: '50%',
-    width: '4rem',
-    height: '4rem',
-    animation: 'spin 1s linear infinite',
-    display: 'inline-block',
-};
-
-const userAvatarStyle = {
-    width: '6rem', // w-24
-    height: '6rem', // h-24
-    backgroundColor: '#BFDBFE', // Blue-200
-    borderRadius: '9999px', // Full rounded
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#2B6CB0', // Blue-700
-    fontSize: '3.125rem', // text-5xl
-    fontWeight: 'bold',
-};
-
-const userAvatarStyleSmall = {
-    width: '3rem', // w-12
-    height: '3rem', // h-12
-    backgroundColor: '#BFDBFE', // Blue-200
-    borderRadius: '9999px', // Full rounded
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#2B6CB0', // Blue-700
-    fontSize: '1.25rem', // text-xl
-    fontWeight: 'bold',
-};
-
-const userAvatarStyleBig = {
-    width: '8rem', // w-32
-    height: '8rem', // h-32
-    backgroundColor: '#BFDBFE', // Blue-200
-    borderRadius: '9999px', // Full rounded
-    objectFit: 'cover',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#2B6CB0', // Blue-700
-    fontSize: '3.125rem', // text-2xl
-    fontWeight: 'bold',
-};
-
-const dashboardProfileSectionStyle = {
-    backgroundColor: '#FFFFFF',
-    borderRadius: '0.75rem',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    padding: '2rem',
-    marginBottom: '2.5rem',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-};
-
-const pointsButtonStyle = {
-    marginTop: '0.5rem',
-    padding: '0.5rem 1rem',
-    backgroundColor: '#3182CE', // Blue-500
-    color: '#FFFFFF',
-    borderRadius: '0.375rem',
-    cursor: 'pointer',
-    border: 'none',
-    outline: 'none',
-    transition: 'background-color 0.15s ease-in-out',
-};
-
-const emptyStateCardStyle = {
-    backgroundColor: '#FFFFFF',
-    padding: '1.5rem',
-    borderRadius: '0.5rem',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-    textAlign: 'center',
-    color: '#4A5568',
-};
-
-const emptyStateButtonStyle = {
-    padding: '0.75rem 1.5rem',
-    backgroundColor: '#48BB78', // Green-600
-    color: '#FFFFFF',
-    borderRadius: '0.375rem',
-    cursor: 'pointer',
-    border: 'none',
-    outline: 'none',
-    transition: 'background-color 0.15s ease-in-out',
-};
-
-const dashboardGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '1.5rem',
-};
-
-const dashboardItemCardStyle = {
-    backgroundColor: '#FFFFFF',
-    borderRadius: '0.75rem',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    overflow: 'hidden',
-    cursor: 'pointer',
-    transition: 'transform 0.3s ease-in-out',
-};
-
-const dashboardItemImageStyle = {
-    width: '100%',
-    height: '12rem', // h-48
-    objectFit: 'cover',
-};
-
-const dashboardItemContentStyle = {
-    padding: '1rem',
-};
-
-const dashboardItemTitleStyle = {
-    fontWeight: '600',
-    fontSize: '1.25rem',
-    color: '#2D3748',
-    marginBottom: '0.5rem',
-};
-
-const dashboardItemDescriptionStyle = {
-    color: '#4A5568',
-    fontSize: '0.875rem',
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
-};
-
-const dashboardItemFooterStyle = {
-    marginTop: '1rem',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-};
-
-const dashboardItemPointsStyle = {
-    color: '#3182CE', // Blue-600
-    fontWeight: 'bold',
-};
-
-const dashboardItemStatusStyle = {
-    fontSize: '0.875rem',
-    fontWeight: '500',
-    padding: '0.25rem 0.75rem',
-    borderRadius: '9999px', // Full rounded
-};
-
-const formGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: '1fr', // Default to single column
-    gap: '1.5rem',
-};
-
-// Media query for formGridStyle (example for larger screens)
-// You would typically use a CSS file for media queries, but for inline styles:
-// This is a simplified representation, true responsive inline styles are complex.
-// For a real app, external CSS or a CSS-in-JS library with responsive features is better.
-if (window.innerWidth >= 768) { // md breakpoint
-    formGridStyle.gridTemplateColumns = '1fr 1fr';
-}
-
-const itemDetailContainerStyle = {
-    backgroundColor: '#FFFFFF',
-    borderRadius: '0.75rem',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    padding: '2rem',
-    display: 'grid',
-    gridTemplateColumns: '1fr', // Default to single column
-    gap: '2.5rem',
-};
-
-// Media query for itemDetailContainerStyle
-if (window.innerWidth >= 768) { // md breakpoint
-    itemDetailContainerStyle.gridTemplateColumns = '1fr 1fr';
-}
-
-const itemImageGalleryStyle = {
-    // md:col-span-1
-};
-
-const itemMainImageStyle = {
-    width: '100%',
-    height: '24rem', // h-96
-    objectFit: 'cover',
-    borderRadius: '0.5rem',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    marginBottom: '1rem',
-};
-
-const itemThumbnailsStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '0.5rem',
-};
-
-const itemThumbnailStyle = {
-    width: '100%',
-    height: '6rem', // h-24
-    objectFit: 'cover',
-    borderRadius: '0.375rem',
-    cursor: 'pointer',
-    opacity: 0.9,
-    transition: 'opacity 0.15s ease-in-out',
-};
-
-const itemDetailsContentStyle = {
-    // md:col-span-1
-};
-
-const itemTitleStyle = {
-    fontSize: '2.25rem',
-    fontWeight: 'bold',
-    color: '#2D3748',
-    marginBottom: '1rem',
-};
-
-const itemDescriptionStyle = {
-    color: '#4A5568',
-    fontSize: '1.125rem',
-    marginBottom: '1.5rem',
-    lineHeight: '1.625',
-};
-
-const itemInfoBlockStyle = {
-    marginBottom: '1.5rem',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem',
-};
-
-const itemInfoTextStyle = {
-    color: '#4A5568',
-};
-
-const itemPointsStatusStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#EFF6FF', // Blue-50
-    padding: '1rem',
-    borderRadius: '0.5rem',
-    marginBottom: '1.5rem',
-    boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.05)',
-};
-
-const itemPointsValueStyle = {
-    fontSize: '1.875rem',
-    fontWeight: '800',
-    color: '#2B6CB0', // Blue-700
-};
-
-const itemStatusBadgeStyle = {
-    fontSize: '1.125rem',
-    fontWeight: 'bold',
-    padding: '0.5rem 1rem',
-    borderRadius: '9999px', // Full rounded
-};
-
-const uploaderInfoStyle = {
-    marginBottom: '1.5rem',
-};
-
-const uploaderInfoTitleStyle = {
-    fontSize: '1.25rem',
-    fontWeight: '600',
-    color: '#2D3748',
-    marginBottom: '0.5rem',
-};
-
-const uploaderInfoTextStyle = {
-    color: '#4A5568',
-};
-
-const itemActionButtonsStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-};
-
-const actionButtonStyle = {
-    flex: 1,
-    padding: '0.75rem 1.5rem',
-    color: '#FFFFFF',
-    borderRadius: '0.375rem',
-    fontSize: '1.125rem',
-    fontWeight: '600',
-    cursor: 'pointer',
-    border: 'none',
-    outline: 'none',
-    transition: 'background-color 0.15s ease-in-out',
-};
-
-const itemUnavailableMessageStyle = {
-    fontSize: '0.875rem',
-    color: '#EF4444', // Red-500
-    marginTop: '1rem',
-    textAlign: 'center',
-};
-
-// New/Updated Dashboard Specific Styles
-const dashboardMainContentStyle = {
-    flexGrow: 1,
-    maxWidth: '72rem',
-    margin: '0 auto',
-    padding: '2rem 1.5rem', // Adjusted padding
-};
-
-const dashboardCardStyle = {
-    backgroundColor: '#FFFFFF',
-    borderRadius: '0.75rem',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    marginBottom: '2rem', // Added margin-bottom
-};
-
-const outlineButtonStyle = {
-    padding: '0.5rem 1rem',
-    border: '1px solid #CBD5E0',
-    borderRadius: '0.375rem',
-    backgroundColor: '#FFFFFF',
-    color: '#4A5568',
-    cursor: 'pointer',
-    transition: 'background-color 0.15s ease-in-out, border-color 0.15s ease-in-out',
-};
-
-const ghostButtonStyle = {
-    padding: '0.5rem 1rem',
-    background: 'none',
-    border: 'none',
-    color: '#4A5568',
-    cursor: 'pointer',
-    transition: 'background-color 0.15s ease-in-out',
-};
-
-const badgeStyle = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    padding: '0.25rem 0.75rem',
-    borderRadius: '9999px',
-    fontSize: '0.75rem',
-    fontWeight: '600',
-    color: '#FFFFFF', // Default badge text color
-};
-
-const tabsContainerStyle = {
-    marginBottom: '2rem',
-};
-
-const tabsListStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    backgroundColor: '#E2E8F0', // Gray-200
-    borderRadius: '0.5rem',
-    padding: '0.25rem',
-    marginBottom: '1.5rem',
-};
-
-const tabsTriggerStyle = {
-    padding: '0.75rem 1rem',
-    borderRadius: '0.375rem',
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    fontWeight: '500',
-    color: '#4A5568',
-    transition: 'background-color 0.15s ease-in-out, color 0.15s ease-in-out',
-};
-
-const tabsTriggerActiveStyle = {
-    backgroundColor: '#FFFFFF',
-    color: '#2D3748',
-    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-};
-
-const tabsContentStyle = {
-    // Styles for the content area of each tab
-};
-
-const statsGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '1.5rem',
-    marginBottom: '1.5rem',
-};
-
-const filterGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', // Adjusted for filters
-    gap: '1rem',
-};
-
-// Styles for EditProfilePage
-const editProfileGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: '1fr', // Default to single column
-    gap: '2rem',
-};
-
-if (window.innerWidth >= 1024) { // lg breakpoint
-    editProfileGridStyle.gridTemplateColumns = '1fr 2fr';
-}
-
-const cardHeaderStyle = {
-    padding: '1.25rem', // p-5
-    borderBottom: '1px solid #E2E8F0', // border-b
-    fontSize: '1.125rem', // text-lg
-    fontWeight: '600', // font-semibold
-    color: '#2D3748', // text-gray-800
-};
-
-const actionButtonCircleStyle = {
-    width: '2.5rem', // w-10
-    height: '2.5rem', // h-10
-    borderRadius: '9999px', // rounded-full
-    backgroundColor: '#3182CE', // bg-primary
-    color: '#FFFFFF', // text-white
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', // shadow
-    cursor: 'pointer',
-    border: 'none',
-    outline: 'none',
-    transition: 'background-color 0.15s ease-in-out',
-};
-
-const separatorStyle = {
-    height: '1px',
-    backgroundColor: '#E2E8F0', // border-gray-200
-    width: '100%',
-};
-
-const toggleButtonStyle = {
-    padding: '0.375rem 0.75rem', // px-3 py-1.5
-    borderRadius: '0.375rem', // rounded-md
-    fontSize: '0.875rem', // text-sm
-    fontWeight: '500', // font-medium
-    border: '1px solid transparent',
-    cursor: 'pointer',
-    transition: 'background-color 0.15s ease-in-out, color 0.15s ease-in-out, border-color 0.15s ease-in-out',
-};
-
-
-// Keyframe for spinner animation
-const styleSheet = document.createElement('style');
-styleSheet.type = 'text/css';
-styleSheet.innerText = `
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-`;
-document.head.appendChild(styleSheet);
