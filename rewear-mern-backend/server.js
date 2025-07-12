@@ -141,7 +141,7 @@ const ItemSchema = new mongoose.Schema({
     uploaderEmail: { type: String, required: true }, // Store email for easier display
     status: {
         type: String,
-        enum: ['pending', 'approved', 'rejected'],
+        enum: ['pending', 'approved', 'rejected', 'redeemed'],
         default: 'pending'
     },
     acquiredBy: {
@@ -242,6 +242,27 @@ const PendingRatingSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 const PendingRating = mongoose.model('PendingRating', PendingRatingSchema);
+
+// --- PendingItem Model (Mongoose Schema) ---
+const PendingItemSchema = new mongoose.Schema({
+    title: { type: String, required: true, trim: true },
+    description: { type: String, required: true, trim: true },
+    category: { type: String, required: true, trim: true },
+    type: { type: String, required: true, trim: true },
+    size: { type: String, required: true, trim: true },
+    condition: { type: String, required: true, trim: true },
+    tags: [{ type: String, trim: true }],
+    points: { type: Number, required: true, min: 1 },
+    imageUrl: { type: String, default: 'https://placehold.co/600x400/E0E7FF/3B82F6?text=Clothing+Item' },
+    uploader: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    uploaderEmail: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+});
+const PendingItem = mongoose.model('PendingItem', PendingItemSchema);
 
 
 // --- Authentication Middleware ---
@@ -398,8 +419,16 @@ app.post('/api/login', async (req, res) => {
 // @desc    Get logged in user data (protected route)
 // @access  Private
 app.get('/api/auth', authMiddleware, async (req, res) => {
+    if (req.user.id === 'static-admin-id') {
+        return res.json({
+            _id: 'static-admin-id',
+            email: 'admin@example.com',
+            role: 'admin',
+            points: 0,
+            createdAt: new Date(0)
+        });
+    }
     try {
-        // Find user by ID from the token payload, exclude password
         const user = await User.findById(req.user.id).select('-password');
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
@@ -415,8 +444,16 @@ app.get('/api/auth', authMiddleware, async (req, res) => {
 // @desc    Get user profile by ID (for profile page, could be public or private)
 // @access  Public (or Private if you only want authenticated users to see full profiles)
 app.get('/api/users/:id', async (req, res) => {
+    if (req.params.id === 'static-admin-id') {
+        return res.json({
+            _id: 'static-admin-id',
+            email: 'admin@example.com',
+            role: 'admin',
+            points: 0,
+            createdAt: new Date(0)
+        });
+    }
     try {
-        // Select all fields except password for security
         const user = await User.findById(req.params.id).select('-password');
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
@@ -465,6 +502,9 @@ app.put('/api/users/:id', authMiddleware, async (req, res) => {
 // @desc    Get user's points
 // @access  Private (or Public if you want to show other users' points)
 app.get('/api/users/:id/points', authMiddleware, async (req, res) => {
+    if (req.params.id === 'static-admin-id') {
+        return res.json({ points: 0 });
+    }
     try {
         // Ensure the requested ID matches the authenticated user's ID for private data
         if (req.params.id !== req.user.id) {
@@ -482,57 +522,42 @@ app.get('/api/users/:id/points', authMiddleware, async (req, res) => {
 });
 
 // @route   POST /api/items
-// @desc    Add a new clothing item
+// @desc    Add a new clothing item (pending approval)
 // @access  Private
 app.post('/api/items', authMiddleware, async (req, res) => {
     const { title, description, category, type, size, condition, tags, points, imageUrl } = req.body;
-
-    // Basic validation
     if (!title || !description || !category || !type || !size || !condition || !points) {
         return res.status(400).json({ msg: 'Please enter all required item fields' });
     }
     if (isNaN(points) || points < 1) {
         return res.status(400).json({ msg: 'Points must be a positive number' });
     }
-
     try {
-        const user = await User.findById(req.user.id).select('email points'); // Select points too
+        const user = await User.findById(req.user.id).select('email points');
         if (!user) {
             return res.status(404).json({ msg: 'Uploader user not found' });
         }
-
-        // Process tags:
         let processedTags = [];
         if (typeof tags === 'string' && tags.trim() !== '') {
             processedTags = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
         } else if (Array.isArray(tags)) {
-            processedTags = tags.map(tag => String(tag).trim()).filter(tag => tag); // Ensure array elements are strings
+            processedTags = tags.map(tag => String(tag).trim()).filter(tag => tag);
         }
-        // If tags is null/undefined/empty string, processedTags will be an empty array.
-
-        const newItem = new Item({
+        const newPendingItem = new PendingItem({
             title,
             description,
             category,
             type,
-            size, // Use the string size directly
+            size,
             condition,
-            tags: processedTags, // Use the processedTags array
+            tags: processedTags,
             points,
-            imageUrl: imageUrl || `https://placehold.co/600x400/E0E7FF/3B82F6?text=${title ? encodeURIComponent(title) : 'Clothing+Item'}`, // Encode title for URL
-            uploader: req.user.id, // Associate item with the authenticated user's ID
-            uploaderEmail: user.email,
-            status: 'pending' // Default to pending for new items
+            imageUrl: imageUrl || `https://placehold.co/600x400/E0E7FF/3B82F6?text=${title ? encodeURIComponent(title) : 'Clothing+Item'}`,
+            uploader: req.user.id,
+            uploaderEmail: user.email
         });
-
-        const item = await newItem.save();
-
-        // Award points to the uploader (e.g., 10 points per listing)
-        const pointsAwarded = 10; // Define points for listing
-        user.points += pointsAwarded;
-        await user.save();
-
-        res.status(201).json({ msg: 'Item listed successfully!', item, newPoints: user.points });
+        await newPendingItem.save();
+        res.status(201).json({ msg: 'Item submitted for admin approval!' });
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error when adding item');
@@ -600,25 +625,31 @@ app.post('/api/items/:id/redeem', authMiddleware, async (req, res) => {
     try {
         const item = await Item.findById(req.params.id);
         if (!item) {
+            console.error('Redemption failed: Item not found');
             return res.status(404).json({ msg: 'Item not found' });
         }
         if (item.uploader.toString() === req.user.id) {
+            console.error('Redemption failed: User is uploader', { uploader: item.uploader, user: req.user.id });
             return res.status(400).json({ msg: 'You cannot redeem your own item' });
         }
         if (item.status !== 'approved') {
+            console.error('Redemption failed: Item status not approved', { status: item.status });
             return res.status(400).json({ msg: 'Item is not available for redemption' });
         }
 
         const buyer = await User.findById(req.user.id);
         if (!buyer) {
+            console.error('Redemption failed: Buyer user not found', { userId: req.user.id });
             return res.status(404).json({ msg: 'Buyer user not found' });
         }
         if (buyer.points < item.points) {
+            console.error('Redemption failed: Insufficient points', { buyerPoints: buyer.points, itemPoints: item.points });
             return res.status(400).json({ msg: `Insufficient points. You need ${item.points} points.` });
         }
 
         const uploader = await User.findById(item.uploader);
         if (!uploader) {
+            console.error('Redemption failed: Uploader user not found', { uploaderId: item.uploader });
             return res.status(404).json({ msg: 'Uploader user not found' });
         }
 
@@ -637,13 +668,12 @@ app.post('/api/items/:id/redeem', authMiddleware, async (req, res) => {
         await item.save();
 
         // --- Create Notification for Uploader ---
-        // This is a placeholder for actual notification sending (e.g., email/SMS)
-        if (uploader.preferences.notifications) { // Check if uploader wants notifications
+        if (uploader.preferences.notifications) {
             const notification = new Notification({
                 userId: uploader._id,
                 type: 'item_redeemed',
                 message: `Your item "${item.title}" was redeemed by ${buyer.email} for ${item.points} points!`,
-                link: `/item-detail/${item._id}` // Link to the item detail page
+                link: `/item-detail/${item._id}`
             });
             await notification.save();
             console.log(`Notification created for ${uploader.email}: Item Redeemed`);
@@ -659,8 +689,8 @@ app.post('/api/items/:id/redeem', authMiddleware, async (req, res) => {
         res.json({ msg: `Successfully redeemed "${item.title}" for ${item.points} points!`, item, buyerPoints: buyer.points });
 
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error during item redemption');
+        console.error('Server error during item redemption:', err);
+        res.status(500).json({ msg: 'Server error during item redemption', error: err.message });
     }
 });
 
@@ -864,7 +894,7 @@ const adminMiddleware = (req, res, next) => {
 // @access  Private (Admin only)
 app.get('/api/admin/items/pending', authMiddleware, adminMiddleware, async (req, res) => {
     try {
-        const items = await Item.find({ status: 'pending' })
+        const items = await PendingItem.find({})
             .populate('uploader', 'email name')
             .sort({ createdAt: -1 });
         res.json(items);
@@ -890,30 +920,34 @@ app.get('/api/admin/items/all', authMiddleware, adminMiddleware, async (req, res
 });
 
 // @route   PUT /api/admin/items/:id/approve
-// @desc    Approve an item
+// @desc    Approve a pending item (move to Item collection)
 // @access  Private (Admin only)
 app.put('/api/admin/items/:id/approve', authMiddleware, adminMiddleware, async (req, res) => {
     try {
-        const item = await Item.findByIdAndUpdate(
-            req.params.id,
-            { status: 'approved' },
-            { new: true }
-        ).populate('uploader', 'email name');
-
-        if (!item) {
-            return res.status(404).json({ msg: 'Item not found' });
+        const pendingItem = await PendingItem.findById(req.params.id);
+        if (!pendingItem) {
+            return res.status(404).json({ msg: 'Pending item not found' });
         }
-
-        // Create notification for uploader
-        const notification = new Notification({
-            userId: item.uploader._id,
-            type: 'item_approved',
-            message: `Your item "${item.title}" has been approved and is now visible to the community!`,
-            link: `/item-detail/${item._id}`
+        // Move to Item collection
+        const item = new Item({
+            title: pendingItem.title,
+            description: pendingItem.description,
+            category: pendingItem.category,
+            type: pendingItem.type,
+            size: pendingItem.size,
+            condition: pendingItem.condition,
+            tags: pendingItem.tags,
+            points: pendingItem.points,
+            imageUrl: pendingItem.imageUrl,
+            uploader: pendingItem.uploader,
+            uploaderEmail: pendingItem.uploaderEmail,
+            status: 'approved',
+            createdAt: pendingItem.createdAt
         });
-        await notification.save();
-
-        res.json({ msg: 'Item approved successfully', item });
+        await item.save();
+        await PendingItem.findByIdAndDelete(req.params.id);
+        // Optionally notify uploader here
+        res.json({ msg: 'Item approved and published!', item });
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error approving item');
@@ -921,30 +955,16 @@ app.put('/api/admin/items/:id/approve', authMiddleware, adminMiddleware, async (
 });
 
 // @route   PUT /api/admin/items/:id/reject
-// @desc    Reject an item
+// @desc    Reject a pending item (delete from PendingItem)
 // @access  Private (Admin only)
 app.put('/api/admin/items/:id/reject', authMiddleware, adminMiddleware, async (req, res) => {
     try {
-        const item = await Item.findByIdAndUpdate(
-            req.params.id,
-            { status: 'rejected' },
-            { new: true }
-        ).populate('uploader', 'email name');
-
-        if (!item) {
-            return res.status(404).json({ msg: 'Item not found' });
+        const pendingItem = await PendingItem.findByIdAndDelete(req.params.id);
+        if (!pendingItem) {
+            return res.status(404).json({ msg: 'Pending item not found' });
         }
-
-        // Create notification for uploader
-        const notification = new Notification({
-            userId: item.uploader._id,
-            type: 'item_rejected',
-            message: `Your item "${item.title}" has been rejected. Please review our community guidelines.`,
-            link: `/dashboard`
-        });
-        await notification.save();
-
-        res.json({ msg: 'Item rejected successfully', item });
+        // Optionally notify uploader here
+        res.json({ msg: 'Item rejected and removed.' });
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error rejecting item');
